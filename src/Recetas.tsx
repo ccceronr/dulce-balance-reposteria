@@ -1,7 +1,9 @@
 import { useState, type FormEvent } from 'react'
+import DetalleReceta from './DetalleReceta'
 import IconoChocolates from './IconoChocolates'
 import type {
   ArticuloInventario,
+  Configuracion,
   PresentacionVenta,
   Receta,
 } from './lib/modelos'
@@ -26,6 +28,7 @@ interface RecetasProps {
   inventario: ArticuloInventario[]
   recetas: Receta[]
   presentaciones: PresentacionVenta[]
+  configuracion: Configuracion
   onGuardar: (receta: Receta) => void
   onEliminar: (recetaId: string) => void
   onIrAInventario: () => void
@@ -57,6 +60,7 @@ function Recetas({
   inventario,
   recetas,
   presentaciones,
+  configuracion,
   onGuardar,
   onEliminar,
   onIrAInventario,
@@ -64,6 +68,7 @@ function Recetas({
   const [formulario, setFormulario] = useState<FormularioReceta>(formularioVacio)
   const [recetaEditando, setRecetaEditando] = useState<string | null>(null)
   const [formularioAbierto, setFormularioAbierto] = useState(false)
+  const [recetaDetalle, setRecetaDetalle] = useState<string | null>(null)
   const [error, setError] = useState('')
 
   const ingredientesDisponibles = inventario.filter((articulo) => articulo.tipo === 'ingrediente')
@@ -84,6 +89,7 @@ function Recetas({
   }
 
   function editarReceta(receta: Receta) {
+    setRecetaDetalle(null)
     setFormulario({
       nombre: receta.nombre,
       rendimiento: String(receta.rendimiento),
@@ -134,6 +140,8 @@ function Recetas({
       nombre: formulario.nombre.trim(),
       rendimiento: Number(formulario.rendimiento),
       tipoElaboracion: formulario.tipoElaboracion,
+      // Conserva el precio real guardado desde la pantalla de detalle.
+      precioVentaReal: recetas.find((existente) => existente.id === recetaEditando)?.precioVentaReal,
       ingredientes: formulario.ingredientes.map((linea) => ({
         insumoId: linea.insumoId,
         cantidadUsada: Number(linea.cantidadUsada),
@@ -271,6 +279,21 @@ function Recetas({
     )
   }
 
+  const recetaSeleccionada = recetas.find((receta) => receta.id === recetaDetalle)
+  if (recetaSeleccionada) {
+    return (
+      <DetalleReceta
+        configuracion={configuracion}
+        inventario={inventario}
+        key={recetaSeleccionada.id}
+        onCambiarPrecio={(precioVentaReal) => onGuardar({ ...recetaSeleccionada, precioVentaReal })}
+        onEditar={() => editarReceta(recetaSeleccionada)}
+        onVolver={() => setRecetaDetalle(null)}
+        receta={recetaSeleccionada}
+      />
+    )
+  }
+
   return (
     <section aria-labelledby="recipes-title" className="recipes-view">
       <div className="page-heading">
@@ -403,18 +426,24 @@ function Recetas({
           </div>
           {recetas.map((receta) => (
             <article className="recipe-row" key={receta.id}>
-              <div className="recipe-row-name">
+              <button
+                aria-label={`Ver costos y sobres de ${receta.nombre}`}
+                className="recipe-row-name"
+                onClick={() => setRecetaDetalle(receta.id)}
+                type="button"
+              >
                 <span aria-hidden="true" className="recipe-mark">R</span>
-                <div>
-                  <h2>{receta.nombre}</h2>
-                  <p>{receta.ingredientes.length} ingredientes · {receta.empaques.length} empaques individuales</p>
-                </div>
-              </div>
+                <span>
+                  <span className="recipe-row-title">{receta.nombre}</span>
+                  <span className="recipe-row-meta">{receta.ingredientes.length} ingredientes · {receta.empaques.length} empaques individuales</span>
+                </span>
+              </button>
               <span className="recipe-row-yield">{receta.rendimiento} unidades</span>
               <span className={`recipe-type ${receta.tipoElaboracion}`}>
                 {receta.tipoElaboracion === 'rapida' ? 'Rápida · 20%' : 'Elaborada · 25%'}
               </span>
               <div className="recipe-row-actions">
+                <button className="text-action" onClick={() => setRecetaDetalle(receta.id)} type="button">Costos</button>
                 <button className="text-action" onClick={() => editarReceta(receta)} type="button">Editar</button>
                 <button className="text-action" onClick={() => duplicarReceta(receta)} type="button">Duplicar</button>
                 <button className="text-action text-action-danger" onClick={() => solicitarEliminar(receta)} type="button">Eliminar</button>

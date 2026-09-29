@@ -24,6 +24,7 @@ export interface Receta {
   empaques: IngredienteReceta[]
   rendimiento: number
   tipoElaboracion: TipoElaboracion
+  precioVentaReal?: number
 }
 
 export interface ArticuloPresentacion {

@@ -476,6 +476,7 @@ function App() {
           </>
         ) : (
           <Recetas
+            configuracion={datos.configuracion}
             inventario={datos.inventario}
             onEliminar={eliminarReceta}
             onGuardar={guardarReceta}

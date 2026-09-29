@@ -674,7 +674,26 @@ select:focus-visible {
   font-family: var(--fuente-editorial);
 }
 
-.recipe-row-name h2 {
+.recipe-row-name {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.recipe-row-name:hover .recipe-row-title {
+  color: var(--rosa-oscuro);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.recipe-row-name:focus-visible {
+  outline: 3px solid rgb(184 93 119 / 25%);
+  outline-offset: 2px;
+}
+
+.recipe-row-title {
+  display: block;
   overflow-wrap: anywhere;
   margin: 0;
   color: var(--ciruela);
@@ -682,7 +701,8 @@ select:focus-visible {
   font-weight: 650;
 }
 
-.recipe-row-name p {
+.recipe-row-meta {
+  display: block;
   margin: 0.25rem 0 0;
   color: #8c777b;
   font-size: 0.67rem;
@@ -954,6 +974,163 @@ select:focus-visible {
   font-size: 0.95rem;
 }
 
+/* Detalle de receta: costos, precios y sobres */
+.recipe-detail {
+  animation: aparecer 180ms ease-out both;
+}
+
+.detail-back {
+  margin: 0 0 1rem -0.5rem;
+}
+
+.detail-costs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.8rem clamp(1.3rem, 5vw, 4rem);
+  border-block: 1px solid var(--linea);
+  padding-block: 1.2rem;
+}
+
+.cost-figure {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.cost-figure span,
+.price-option span {
+  color: #806d71;
+  font-size: 0.72rem;
+}
+
+.cost-figure strong {
+  color: var(--ciruela);
+  font-family: var(--fuente-editorial);
+  font-size: 1.9rem;
+  font-weight: 400;
+}
+
+.cost-breakdown {
+  flex-basis: 100%;
+  margin: 0;
+  color: #8c777b;
+  font-size: 0.72rem;
+}
+
+.detail-block {
+  margin-top: 1.8rem;
+}
+
+.detail-block h2 {
+  margin: 0 0 0.9rem;
+  color: var(--ciruela);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.price-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.price-option {
+  display: grid;
+  gap: 0.3rem;
+  border: 1px solid #e4d2d3;
+  border-radius: 5px;
+  padding: 0.9rem 1rem;
+  background: #fff;
+  text-align: left;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.price-option strong {
+  color: var(--ciruela);
+  font-family: var(--fuente-editorial);
+  font-size: 1.45rem;
+  font-weight: 400;
+}
+
+.price-option.is-selected {
+  border-color: var(--rosa-principal);
+  background: var(--rosa-claro);
+}
+
+.price-option:focus-visible {
+  outline: 3px solid rgb(184 93 119 / 25%);
+  outline-offset: 2px;
+}
+
+.real-price-field {
+  max-width: 320px;
+  margin-top: 1rem;
+}
+
+.detail-alert {
+  margin: 1.5rem 0 0;
+  border-left: 3px solid;
+  border-radius: 2px;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.8rem;
+}
+
+.detail-alert.is-danger {
+  border-color: #bc3f52;
+  background: #fde8ea;
+  color: #8a2c3d;
+}
+
+.detail-alert.is-warning {
+  border-color: #d19a3a;
+  background: #fdf3df;
+  color: #7a5518;
+}
+
+.envelopes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.envelope {
+  display: grid;
+  gap: 0.35rem;
+  border: 1px solid #eadedd;
+  border-radius: 5px;
+  padding: 0.9rem 1rem;
+  background: rgb(255 255 255 / 82%);
+}
+
+.envelope h3 {
+  margin: 0;
+  color: #725e62;
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.envelope strong {
+  color: var(--ciruela);
+  font-family: var(--fuente-editorial);
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.envelope-batch {
+  color: #8c777b;
+  font-size: 0.7rem;
+}
+
+.envelope.is-highlighted {
+  border-color: var(--rosa-principal);
+  background: var(--rosa-claro);
+}
+
+.envelope.is-negative strong {
+  color: #a3324a;
+}
+
 @keyframes aparecer {
   from {
     opacity: 0;
@@ -1003,6 +1180,14 @@ select:focus-visible {
 }
 
 @media (max-width: 560px) {
+  .envelopes {
+    grid-template-columns: 1fr;
+  }
+
+  .real-price-field {
+    max-width: none;
+  }
+
   .topbar {
     min-height: 68px;
   }

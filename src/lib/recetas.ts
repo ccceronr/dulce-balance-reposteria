@@ -1,4 +1,33 @@
-import type { ArticuloInventario, Receta, TipoInventario } from './modelos'
+import {
+  calcularCostoReceta,
+  calcularPreciosSugeridos,
+  calcularSobres,
+  type DatosInsumo,
+  type ResultadoSobres,
+} from './calculos'
+import type {
+  ArticuloInventario,
+  Configuracion,
+  DetalleSobreVenta,
+  Receta,
+  TipoInventario,
+} from './modelos'
+
+export type ResultadoReceta =
+  | {
+      ok: true
+      insumosDirectos: number
+      gastosExtras: number
+      costoTanda: number
+      costoPorUnidad: number
+      precioEstandar: number
+      precioPremium: number
+      precioUsado: number
+      usaPrecioReal: boolean
+      sobresUnidad: ResultadoSobres
+      sobresTanda: DetalleSobreVenta
+    }
+  | { ok: false; error: string }
 
 export function validarReceta(
   receta: Receta,
@@ -10,6 +39,13 @@ export function validarReceta(
 
   if (!Number.isInteger(receta.rendimiento) || receta.rendimiento <= 0) {
     return 'El rendimiento debe ser un número entero mayor que cero.'
+  }
+
+  if (
+    receta.precioVentaReal !== undefined &&
+    (!Number.isInteger(receta.precioVentaReal) || receta.precioVentaReal < 0)
+  ) {
+    return 'El precio de venta real debe ser un número entero mayor o igual a cero.'
   }
 
   if (receta.ingredientes.length === 0) {
@@ -57,4 +93,80 @@ function validarLineas(
   }
 
   return null
+}
+
+export function calcularResultadoReceta(
+  receta: Receta,
+  inventario: ArticuloInventario[],
+  configuracion: Configuracion,
+): ResultadoReceta {
+  const insumos: DatosInsumo[] = []
+  // Los ingredientes son por tanda; los empaques son por unidad y se multiplican por el rendimiento.
+  const lineas = [
+    ...receta.ingredientes.map((linea) => ({ linea, factor: 1 })),
+    ...receta.empaques.map((linea) => ({ linea, factor: receta.rendimiento })),
+  ]
+
+  for (const { linea, factor } of lineas) {
+    const articulo = inventario.find((item) => item.id === linea.insumoId)
+    if (!articulo) {
+      return {
+        ok: false,
+        error: 'Uno de los insumos de esta receta ya no está en el inventario. Edita la receta para reemplazarlo.',
+      }
+    }
+
+    insumos.push({
+      precioCompra: articulo.precioCompra,
+      cantidadTotalComprada: articulo.cantidadTotalComprada,
+      cantidadUsada: linea.cantidadUsada * factor,
+    })
+  }
+
+  try {
+    const costo = calcularCostoReceta({
+      insumos,
+      rendimiento: receta.rendimiento,
+      porcentajeIndirectos: configuracion.porcentajeIndirectos,
+    })
+    const precios = calcularPreciosSugeridos(costo.costoPorUnidad, {
+      multiplicadorEstandar: configuracion.multiplicadorEstandar,
+      multiplicadorPremium: configuracion.multiplicadorPremium,
+    })
+    const usaPrecioReal = receta.precioVentaReal !== undefined
+    const precioUsado = receta.precioVentaReal ?? precios.precioEstandar
+    const sobresUnidad = calcularSobres({
+      costoPorUnidad: costo.costoPorUnidad,
+      precioVenta: precioUsado,
+      tipoElaboracion: receta.tipoElaboracion,
+      porcentajeManoObra:
+        receta.tipoElaboracion === 'rapida'
+          ? configuracion.porcentajeManoObraRapida
+          : configuracion.porcentajeManoObraElaborada,
+    })
+
+    return {
+      ok: true,
+      insumosDirectos: costo.insumosDirectos,
+      gastosExtras: costo.gastosExtras,
+      costoTanda: costo.costoBaseTotal,
+      costoPorUnidad: costo.costoPorUnidad,
+      precioEstandar: precios.precioEstandar,
+      precioPremium: precios.precioPremium,
+      precioUsado,
+      usaPrecioReal,
+      sobresUnidad,
+      sobresTanda: {
+        sobreReposicion: sobresUnidad.sobreReposicion * receta.rendimiento,
+        sobreSueldo: sobresUnidad.sobreSueldo * receta.rendimiento,
+        sobreGanancia: sobresUnidad.sobreGanancia * receta.rendimiento,
+        dineroLibre: sobresUnidad.dineroLibre * receta.rendimiento,
+      },
+    }
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'No fue posible calcular esta receta.',
+    }
+  }
 }
