@@ -1,15 +1,8 @@
-import type { Configuracion, DatosAplicacion } from './modelos'
+import { CONFIGURACION_PREDETERMINADA } from './configuracion'
+import type { DatosAplicacion } from './modelos'
 
 export const CLAVE_DATOS = 'dulce-balance:datos'
 const VERSION_ESQUEMA = 1
-
-const CONFIGURACION_PREDETERMINADA: Configuracion = {
-  porcentajeIndirectos: 0.1,
-  multiplicadorEstandar: 2.2,
-  multiplicadorPremium: 2.5,
-  porcentajeManoObraRapida: 0.2,
-  porcentajeManoObraElaborada: 0.25,
-}
 
 interface DatosAlmacenados {
   version: number

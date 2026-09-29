@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import type { ArticuloInventario, Configuracion, Receta } from './lib/modelos'
-import { calcularResultadoReceta } from './lib/recetas'
+import type { ArticuloInventario, Configuracion, Receta } from '../lib/modelos'
+import { obtenerPorcentajeManoObra } from '../lib/configuracion'
+import { FORMATO_COP, FORMATO_PORCENTAJE } from '../lib/formato'
+import { calcularResultadoReceta } from '../lib/recetas'
 
 interface DetalleRecetaProps {
   receta: Receta
@@ -10,16 +12,6 @@ interface DetalleRecetaProps {
   onEditar: () => void
   onVolver: () => void
 }
-
-const FORMATO_COP = new Intl.NumberFormat('es-CO', {
-  style: 'currency',
-  currency: 'COP',
-  maximumFractionDigits: 0,
-})
-const FORMATO_PORCENTAJE = new Intl.NumberFormat('es-CO', {
-  style: 'percent',
-  maximumFractionDigits: 1,
-})
 
 function DetalleReceta({
   receta,
@@ -35,9 +27,7 @@ function DetalleReceta({
   const [errorPrecio, setErrorPrecio] = useState('')
 
   const resultado = calcularResultadoReceta(receta, inventario, configuracion)
-  const porcentajeManoObra = receta.tipoElaboracion === 'rapida'
-    ? configuracion.porcentajeManoObraRapida
-    : configuracion.porcentajeManoObraElaborada
+  const porcentajeManoObra = obtenerPorcentajeManoObra(receta.tipoElaboracion, configuracion)
 
   function cambiarPrecio(texto: string) {
     setPrecioTexto(texto)

@@ -5,6 +5,7 @@ import {
   type DatosInsumo,
   type ResultadoSobres,
 } from './calculos'
+import { obtenerPorcentajeManoObra } from './configuracion'
 import type {
   ArticuloInventario,
   Configuracion,
@@ -139,10 +140,7 @@ export function calcularResultadoReceta(
       costoPorUnidad: costo.costoPorUnidad,
       precioVenta: precioUsado,
       tipoElaboracion: receta.tipoElaboracion,
-      porcentajeManoObra:
-        receta.tipoElaboracion === 'rapida'
-          ? configuracion.porcentajeManoObraRapida
-          : configuracion.porcentajeManoObraElaborada,
+      porcentajeManoObra: obtenerPorcentajeManoObra(receta.tipoElaboracion, configuracion),
     })
 
     return {

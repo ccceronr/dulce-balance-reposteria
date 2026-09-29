@@ -1,4 +1,5 @@
-export type TipoElaboracion = 'rapida' | 'elaborada'
+import { CONFIGURACION_PREDETERMINADA, obtenerPorcentajeManoObra } from './configuracion'
+import type { TipoElaboracion } from './modelos'
 
 export interface DatosInsumo {
   precioCompra: number
@@ -45,11 +46,6 @@ export interface ResultadoSobres {
   alertaSueldo: boolean
 }
 
-const PORCENTAJE_INDIRECTOS_PREDETERMINADO = 0.1
-const MULTIPLICADOR_ESTANDAR_PREDETERMINADO = 2.2
-const MULTIPLICADOR_PREMIUM_PREDETERMINADO = 2.5
-const PORCENTAJE_MANO_OBRA_RAPIDA = 0.2
-const PORCENTAJE_MANO_OBRA_ELABORADA = 0.25
 const PORCENTAJE_MANO_OBRA_MINIMO = 0.2
 const PORCENTAJE_MANO_OBRA_MAXIMO = 0.3
 const VALOR_REDONDEO = 1_000
@@ -91,7 +87,7 @@ export function calcularCostoInsumo({
 export function calcularCostoReceta({
   insumos,
   rendimiento,
-  porcentajeIndirectos = PORCENTAJE_INDIRECTOS_PREDETERMINADO,
+  porcentajeIndirectos = CONFIGURACION_PREDETERMINADA.porcentajeIndirectos,
 }: DatosReceta): ResultadoCostoReceta {
   validarPositivo('El rendimiento', rendimiento)
   validarNoNegativo('El porcentaje de costos indirectos', porcentajeIndirectos)
@@ -118,8 +114,8 @@ function redondearAlMillar(valor: number): number {
 export function calcularPreciosSugeridos(
   costoPorUnidad: number,
   {
-    multiplicadorEstandar = MULTIPLICADOR_ESTANDAR_PREDETERMINADO,
-    multiplicadorPremium = MULTIPLICADOR_PREMIUM_PREDETERMINADO,
+    multiplicadorEstandar = CONFIGURACION_PREDETERMINADA.multiplicadorEstandar,
+    multiplicadorPremium = CONFIGURACION_PREDETERMINADA.multiplicadorPremium,
   }: OpcionesPreciosSugeridos = {},
 ): ResultadoPreciosSugeridos {
   validarNoNegativo('El costo por unidad', costoPorUnidad)
@@ -142,9 +138,7 @@ export function calcularSobres({
   validarNoNegativo('El precio de venta', precioVenta)
 
   const porcentaje = porcentajeManoObra ??
-    (tipoElaboracion === 'rapida'
-      ? PORCENTAJE_MANO_OBRA_RAPIDA
-      : PORCENTAJE_MANO_OBRA_ELABORADA)
+    obtenerPorcentajeManoObra(tipoElaboracion, CONFIGURACION_PREDETERMINADA)
 
   validarNumero('El porcentaje de mano de obra', porcentaje)
   if (

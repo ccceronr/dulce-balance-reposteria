@@ -1,5 +1,4 @@
-import type { TipoElaboracion } from './calculos'
-
+export type TipoElaboracion = 'rapida' | 'elaborada'
 export type TipoInventario = 'ingrediente' | 'empaque'
 export type UnidadInventario = 'g' | 'ml' | 'unidad'
 

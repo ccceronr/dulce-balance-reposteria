@@ -6,9 +6,11 @@ import type {
   Configuracion,
   PresentacionVenta,
   Receta,
-} from './lib/modelos'
-import type { TipoElaboracion } from './lib/calculos'
-import { validarReceta } from './lib/recetas'
+  TipoElaboracion,
+} from '../lib/modelos'
+import { obtenerPorcentajeManoObra } from '../lib/configuracion'
+import { FORMATO_PORCENTAJE } from '../lib/formato'
+import { validarReceta } from '../lib/recetas'
 
 interface LineaFormulario {
   id: string
@@ -370,7 +372,7 @@ function Recetas({
                     onClick={() => setFormulario({ ...formulario, tipoElaboracion: 'rapida' })}
                     type="button"
                   >
-                    Rápida <span>20%</span>
+                    Rápida <span>{FORMATO_PORCENTAJE.format(configuracion.porcentajeManoObraRapida)}</span>
                   </button>
                   <button
                     aria-pressed={formulario.tipoElaboracion === 'elaborada'}
@@ -378,7 +380,7 @@ function Recetas({
                     onClick={() => setFormulario({ ...formulario, tipoElaboracion: 'elaborada' })}
                     type="button"
                   >
-                    Elaborada <span>25%</span>
+                    Elaborada <span>{FORMATO_PORCENTAJE.format(configuracion.porcentajeManoObraElaborada)}</span>
                   </button>
                 </div>
               </fieldset>
@@ -440,7 +442,8 @@ function Recetas({
               </button>
               <span className="recipe-row-yield">{receta.rendimiento} unidades</span>
               <span className={`recipe-type ${receta.tipoElaboracion}`}>
-                {receta.tipoElaboracion === 'rapida' ? 'Rápida · 20%' : 'Elaborada · 25%'}
+                {receta.tipoElaboracion === 'rapida' ? 'Rápida' : 'Elaborada'} ·{' '}
+                {FORMATO_PORCENTAJE.format(obtenerPorcentajeManoObra(receta.tipoElaboracion, configuracion))}
               </span>
               <div className="recipe-row-actions">
                 <button className="text-action" onClick={() => setRecetaDetalle(receta.id)} type="button">Costos</button>
