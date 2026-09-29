@@ -1,8 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import type { ArticuloInventario, DatosAplicacion, TipoInventario } from './lib/modelos'
+import IconoChocolates from './IconoChocolates'
+import Recetas from './Recetas'
+import type { ArticuloInventario, DatosAplicacion, Receta, TipoInventario } from './lib/modelos'
 import { cargarDatos, guardarDatos } from './lib/persistencia'
 
 type FiltroInventario = 'todos' | TipoInventario
+type VistaPrincipal = 'inventario' | 'recetas'
 
 interface FormularioInventario {
   nombre: string
@@ -29,6 +32,7 @@ const FORMATO_CANTIDAD = new Intl.NumberFormat('es-CO', {
 
 function App() {
   const [datos, setDatos] = useState<DatosAplicacion>(() => cargarDatos())
+  const [vistaPrincipal, setVistaPrincipal] = useState<VistaPrincipal>('inventario')
   const [filtro, setFiltro] = useState<FiltroInventario>('todos')
   const [busqueda, setBusqueda] = useState('')
   const [formulario, setFormulario] = useState<FormularioInventario>(FORMULARIO_VACIO)
@@ -173,6 +177,24 @@ function App() {
     setError('')
   }
 
+  function guardarReceta(receta: Receta) {
+    setDatos((actuales) => ({
+      ...actuales,
+      recetas: actuales.recetas.some((actual) => actual.id === receta.id)
+        ? actuales.recetas.map((actual) => actual.id === receta.id ? receta : actual)
+        : [...actuales.recetas, receta],
+    }))
+    setError('')
+  }
+
+  function eliminarReceta(recetaId: string) {
+    setDatos((actuales) => ({
+      ...actuales,
+      recetas: actuales.recetas.filter((receta) => receta.id !== recetaId),
+    }))
+    setError('')
+  }
+
   const cantidadIngredientes = datos.inventario.filter(
     (articulo) => articulo.tipo === 'ingrediente',
   ).length
@@ -197,6 +219,35 @@ function App() {
       </header>
 
       <main className="inventory-page">
+        <nav aria-label="Secciones principales" className="section-tabs" role="tablist">
+          <button
+            aria-selected={vistaPrincipal === 'inventario'}
+            className={vistaPrincipal === 'inventario' ? 'is-active' : ''}
+            onClick={() => {
+              setVistaPrincipal('inventario')
+              setError('')
+            }}
+            role="tab"
+            type="button"
+          >
+            Inventario
+          </button>
+          <button
+            aria-selected={vistaPrincipal === 'recetas'}
+            className={vistaPrincipal === 'recetas' ? 'is-active' : ''}
+            onClick={() => {
+              setVistaPrincipal('recetas')
+              setError('')
+            }}
+            role="tab"
+            type="button"
+          >
+            Recetas
+          </button>
+        </nav>
+
+        {vistaPrincipal === 'inventario' ? (
+          <>
         <div className="page-heading">
           <div>
             <p className="eyebrow"><span /> Tu espacio de trabajo</p>
@@ -411,7 +462,7 @@ function App() {
             </div>
           ) : (
             <div className="empty-state">
-              <span aria-hidden="true" className="empty-mark">✳</span>
+              <IconoChocolates className="empty-illustration" />
                 <h2>{busqueda || filtro !== 'todos' ? 'No hay coincidencias' : 'Aún no tienes ingredientes ni empaques'}</h2>
               <p>{busqueda || filtro !== 'todos' ? 'Prueba otra búsqueda o cambia el filtro.' : 'Agrega lo que compras para preparar tus productos.'}</p>
               {!busqueda && filtro === 'todos' && (
@@ -422,6 +473,17 @@ function App() {
             </div>
           )}
         </section>
+          </>
+        ) : (
+          <Recetas
+            inventario={datos.inventario}
+            onEliminar={eliminarReceta}
+            onGuardar={guardarReceta}
+            onIrAInventario={() => setVistaPrincipal('inventario')}
+            presentaciones={datos.presentaciones}
+            recetas={datos.recetas}
+          />
+        )}
       </main>
 
       <footer className="footer">
