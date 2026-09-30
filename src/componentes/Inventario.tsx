@@ -1,12 +1,13 @@
 import { useState, type FormEvent } from 'react'
 import IconoChocolates from './IconoChocolates'
-import { FORMATO_CANTIDAD, FORMATO_COP } from '../lib/formato'
-import { articuloEstaEnUso, validarArticulo } from '../lib/inventario'
+import { ETIQUETA_UNIDAD, FORMATO_CANTIDAD, FORMATO_COP } from '../lib/formato'
+import { articuloEstaEnUso, cambiaUnidadEnUso, validarArticulo } from '../lib/inventario'
 import type {
   ArticuloInventario,
   PresentacionVenta,
   Receta,
   TipoInventario,
+  UnidadInventario,
 } from '../lib/modelos'
 
 type FiltroInventario = 'todos' | TipoInventario
@@ -16,6 +17,7 @@ interface FormularioInventario {
   tipo: TipoInventario
   precioCompra: string
   cantidadTotalComprada: string
+  unidad: UnidadInventario
 }
 
 interface InventarioProps {
@@ -32,7 +34,10 @@ const FORMULARIO_VACIO: FormularioInventario = {
   tipo: 'ingrediente',
   precioCompra: '',
   cantidadTotalComprada: '',
+  unidad: 'g',
 }
+
+const UNIDADES_INGREDIENTE: UnidadInventario[] = ['g', 'ml', 'unidad']
 
 function Inventario({
   inventario,
@@ -48,6 +53,7 @@ function Inventario({
   const [articuloEditando, setArticuloEditando] = useState<string | null>(null)
   const [formularioAbierto, setFormularioAbierto] = useState(false)
   const [error, setError] = useState('')
+  const [aviso, setAviso] = useState('')
 
   function estaEnUso(articuloId: string): boolean {
     return articuloEstaEnUso(articuloId, { recetas, presentaciones })
@@ -77,6 +83,7 @@ function Inventario({
   }
 
   function abrirFormularioNuevo() {
+    setAviso('')
     setFormulario(FORMULARIO_VACIO)
     setArticuloEditando(null)
     setFormularioAbierto(true)
@@ -84,11 +91,13 @@ function Inventario({
   }
 
   function editarArticulo(articulo: ArticuloInventario) {
+    setAviso('')
     setFormulario({
       nombre: articulo.nombre,
       tipo: articulo.tipo,
       precioCompra: String(articulo.precioCompra),
       cantidadTotalComprada: String(articulo.cantidadTotalComprada),
+      unidad: articulo.unidad,
     })
     setArticuloEditando(articulo.id)
     setFormularioAbierto(true)
@@ -105,10 +114,11 @@ function Inventario({
       tipo: formulario.tipo,
       precioCompra: Number(formulario.precioCompra),
       cantidadTotalComprada: Number(formulario.cantidadTotalComprada),
-      unidad: formulario.tipo === 'ingrediente' ? 'g' : 'unidad',
+      unidad: formulario.tipo === 'ingrediente' ? formulario.unidad : 'unidad',
     }
 
-    const errorValidacion = validarArticulo(articulo, { inventario, recetas, presentaciones })
+    const datos = { inventario, recetas, presentaciones }
+    const errorValidacion = validarArticulo(articulo, datos)
     if (errorValidacion) {
       setError(errorValidacion)
       return
@@ -116,9 +126,15 @@ function Inventario({
 
     onGuardar(articulo)
     limpiarFormulario()
+    setAviso(
+      cambiaUnidadEnUso(articulo, datos)
+        ? `Cambiaste la unidad de “${articulo.nombre}”. Revisa las recetas que lo usan: sus cantidades ahora se leen en la nueva unidad.`
+        : '',
+    )
   }
 
   function eliminarArticulo(articulo: ArticuloInventario) {
+    setAviso('')
     if (estaEnUso(articulo.id)) {
       setError(`No puedes eliminar “${articulo.nombre}” porque está asociado a una receta o caja.`)
       return
@@ -229,7 +245,7 @@ function Inventario({
             </label>
 
             <label className="field">
-              <span>Cantidad comprada <small>({formulario.tipo === 'ingrediente' ? 'g' : 'unidades'})</small></span>
+              <span>Cantidad comprada</span>
               <div className="input-with-suffix">
                 <input
                   inputMode="decimal"
@@ -241,7 +257,22 @@ function Inventario({
                   type="number"
                   value={formulario.cantidadTotalComprada}
                 />
-                <span>{formulario.tipo === 'ingrediente' ? 'g' : 'und.'}</span>
+                {formulario.tipo === 'ingrediente' ? (
+                  <select
+                    aria-label="Unidad de medida"
+                    className="unit-select"
+                    onChange={(evento) =>
+                      setFormulario({ ...formulario, unidad: evento.target.value as UnidadInventario })
+                    }
+                    value={formulario.unidad}
+                  >
+                    {UNIDADES_INGREDIENTE.map((unidad) => (
+                      <option key={unidad} value={unidad}>{ETIQUETA_UNIDAD[unidad]}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <span>und.</span>
+                )}
               </div>
             </label>
 
@@ -259,6 +290,10 @@ function Inventario({
 
       {error && !formularioAbierto && (
         <p aria-live="assertive" className="inline-error">{error}</p>
+      )}
+
+      {aviso && !formularioAbierto && (
+        <p aria-live="polite" className="inline-notice">{aviso}</p>
       )}
 
       <section aria-label="Ingredientes y empaques del inventario" className="inventory-section">
@@ -323,7 +358,7 @@ function Inventario({
                       {FORMATO_COP.format(articulo.precioCompra)}
                     </td>
                     <td className="numeric-cell" data-label="Cantidad">
-                      {FORMATO_CANTIDAD.format(articulo.cantidadTotalComprada)} {articulo.unidad}
+                      {FORMATO_CANTIDAD.format(articulo.cantidadTotalComprada)} {ETIQUETA_UNIDAD[articulo.unidad]}
                     </td>
                     <td className="actions-cell" data-label="Acciones">
                       <button

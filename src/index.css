@@ -330,6 +330,15 @@ select:focus-visible {
   font-size: 0.8rem;
 }
 
+.inline-notice {
+  margin: 1rem 0 0;
+  border-left: 3px solid #d19a3a;
+  padding: 0.55rem 0.8rem;
+  background: #fdf3df;
+  color: #7a5518;
+  font-size: 0.8rem;
+}
+
 .recipes-view > .inline-error {
   margin: 0 0 1rem;
 }
@@ -454,6 +463,20 @@ select:focus-visible {
 
 .input-with-suffix input {
   text-align: right;
+}
+
+.input-with-suffix > .unit-select {
+  width: auto;
+  height: 100%;
+  flex: 0 0 auto;
+  border: 0;
+  border-left: 1px solid #eadedd;
+  border-radius: 0;
+  padding-inline: 0.6rem;
+  background: #fcf4f4;
+  color: #856c71;
+  font-size: 0.75rem;
+  cursor: pointer;
 }
 
 .input-with-prefix input:focus-visible,

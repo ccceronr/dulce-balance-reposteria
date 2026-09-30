@@ -9,7 +9,7 @@ import type {
   TipoElaboracion,
 } from '../lib/modelos'
 import { obtenerPorcentajeManoObra } from '../lib/configuracion'
-import { FORMATO_PORCENTAJE } from '../lib/formato'
+import { ETIQUETA_UNIDAD, FORMATO_PORCENTAJE } from '../lib/formato'
 import { validarReceta } from '../lib/recetas'
 
 interface LineaFormulario {
@@ -211,7 +211,9 @@ function Recetas({
       <div className="recipe-lines">
         {lineas.map((linea, indice) => {
           const articuloSeleccionado = opciones.find((articulo) => articulo.id === linea.insumoId)
-          const unidad = esIngrediente ? 'g' : 'und.'
+          const unidad = esIngrediente
+            ? ETIQUETA_UNIDAD[articuloSeleccionado?.unidad ?? 'g']
+            : ETIQUETA_UNIDAD.unidad
 
           return (
             <div className="recipe-line" key={linea.id}>
@@ -252,7 +254,7 @@ function Recetas({
                   <span>{unidad}</span>
                 </div>
                 {esIngrediente && articuloSeleccionado && (
-                  <small className="field-hint">Por tanda · {articuloSeleccionado.unidad}</small>
+                  <small className="field-hint">Por tanda</small>
                 )}
                 {!esIngrediente && articuloSeleccionado && (
                   <small className="field-hint">Por cada unidad producida</small>

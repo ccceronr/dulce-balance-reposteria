@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ArticuloInventario, PresentacionVenta, Receta } from './modelos'
-import { articuloEstaEnUso, validarArticulo } from './inventario'
+import { articuloEstaEnUso, cambiaUnidadEnUso, validarArticulo } from './inventario'
 
 const mantequilla: ArticuloInventario = {
   id: 'mantequilla',
@@ -78,5 +78,28 @@ describe('validarArticulo', () => {
         { ...datos, recetas: [] },
       ),
     ).toBeNull()
+  })
+})
+
+describe('unidades de medida', () => {
+  it('acepta ingredientes en g, ml o unidad, con decimales', () => {
+    expect(validarArticulo({ ...mantequilla, unidad: 'ml' }, datos)).toBeNull()
+    expect(
+      validarArticulo({ ...mantequilla, id: 'huevos', unidad: 'unidad', cantidadTotalComprada: 30 }, datos),
+    ).toBeNull()
+    expect(
+      validarArticulo({ ...mantequilla, id: 'huevos', unidad: 'unidad', cantidadTotalComprada: 7.5 }, datos),
+    ).toBeNull()
+  })
+
+  it('exige que los empaques se midan por unidad', () => {
+    expect(validarArticulo({ ...cinta, unidad: 'g' }, datos)).toContain('unidad')
+  })
+
+  it('avisa cuando cambia la unidad de un ingrediente usado en recetas', () => {
+    expect(cambiaUnidadEnUso({ ...mantequilla, unidad: 'unidad' }, datos)).toBe(true)
+    expect(cambiaUnidadEnUso(mantequilla, datos)).toBe(false)
+    expect(cambiaUnidadEnUso({ ...mantequilla, unidad: 'unidad' }, { ...datos, recetas: [] })).toBe(false)
+    expect(cambiaUnidadEnUso({ ...mantequilla, id: 'nuevo', unidad: 'ml' }, datos)).toBe(false)
   })
 })

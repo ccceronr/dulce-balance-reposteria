@@ -31,6 +31,10 @@ export function validarArticulo(
     return 'La cantidad comprada debe ser mayor que cero.'
   }
 
+  if (articulo.tipo === 'empaque' && articulo.unidad !== 'unidad') {
+    return 'Los empaques se miden por unidad.'
+  }
+
   if (articulo.tipo === 'empaque' && !Number.isInteger(articulo.cantidadTotalComprada)) {
     return 'La cantidad de empaques debe ser un número entero.'
   }
@@ -45,4 +49,18 @@ export function validarArticulo(
   }
 
   return null
+}
+
+// La cantidad usada en las recetas no se convierte: al cambiar la unidad hay que revisarlas.
+export function cambiaUnidadEnUso(
+  articulo: ArticuloInventario,
+  datos: DatosUso & Pick<DatosAplicacion, 'inventario'>,
+): boolean {
+  const articuloActual = datos.inventario.find((actual) => actual.id === articulo.id)
+
+  return Boolean(
+    articuloActual &&
+      articuloActual.unidad !== articulo.unidad &&
+      articuloEstaEnUso(articulo.id, datos),
+  )
 }
