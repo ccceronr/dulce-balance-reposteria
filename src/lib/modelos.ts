@@ -52,6 +52,8 @@ export interface Configuracion {
   multiplicadorPremium: number
   porcentajeManoObraRapida: number
   porcentajeManoObraElaborada: number
+  // Los precios sugeridos se redondean a este valor: 1.000, 500, 100 o 1 (al peso).
+  valorRedondeo: number
 }
 
 export interface DetalleSobreVenta {

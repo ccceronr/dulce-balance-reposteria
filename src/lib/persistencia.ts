@@ -41,6 +41,14 @@ function esDatosAplicacion(valor: unknown): valor is DatosAplicacion {
   )
 }
 
+// Completa con valores por defecto los campos agregados en versiones posteriores de la app.
+function completarDatos(datos: DatosAplicacion): DatosAplicacion {
+  return {
+    ...datos,
+    configuracion: { ...CONFIGURACION_PREDETERMINADA, ...datos.configuracion },
+  }
+}
+
 function obtenerAlmacenamiento(almacenamiento?: Storage): Storage {
   if (almacenamiento) {
     return almacenamiento
@@ -69,7 +77,7 @@ export function cargarDatos(almacenamiento?: Storage): DatosAplicacion {
       return crearDatosIniciales()
     }
 
-    return almacenado.datos
+    return completarDatos(almacenado.datos)
   } catch {
     return crearDatosIniciales()
   }

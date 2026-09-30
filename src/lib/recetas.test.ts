@@ -86,6 +86,7 @@ describe('calcularResultadoReceta', () => {
     multiplicadorPremium: 2.5,
     porcentajeManoObraRapida: 0.2,
     porcentajeManoObraElaborada: 0.25,
+    valorRedondeo: 1_000,
   }
 
   // Brownie: $20.000 en ingredientes por tanda y una caja de $500 por unidad.
@@ -141,6 +142,17 @@ describe('calcularResultadoReceta', () => {
     expect(resultado.precioPremium).toBe(7_000)
     expect(resultado.precioUsado).toBe(6_000)
     expect(resultado.usaPrecioReal).toBe(false)
+  })
+
+  it('usa el redondeo de la configuración', () => {
+    const resultado = calcularResultadoReceta(
+      brownie,
+      inventarioBrownie,
+      { ...configuracion, valorRedondeo: 100 },
+    )
+
+    expect(resultado.ok && resultado.precioEstandar).toBe(6_100)
+    expect(resultado.ok && resultado.precioPremium).toBe(6_900)
   })
 
   it('calcula los sobres por unidad y por tanda', () => {

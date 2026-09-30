@@ -88,6 +88,27 @@ describe('calcularPreciosSugeridos', () => {
       precioPremium: 1_000,
     })
   })
+
+  it('redondea al valor configurado: $500, $100 o al peso', () => {
+    // 1.000 × 2,25 = 2.250 (empate a $500) y 1.000 × 2,35 = 2.350 (empate a $100).
+    expect(
+      calcularPreciosSugeridos(1_000, {
+        multiplicadorEstandar: 2.25,
+        multiplicadorPremium: 2.6,
+        valorRedondeo: 500,
+      }),
+    ).toEqual({ precioEstandar: 2_500, precioPremium: 2_500 })
+    expect(
+      calcularPreciosSugeridos(1_000, {
+        multiplicadorEstandar: 2.35,
+        multiplicadorPremium: 2.34,
+        valorRedondeo: 100,
+      }),
+    ).toEqual({ precioEstandar: 2_400, precioPremium: 2_300 })
+    expect(
+      calcularPreciosSugeridos(1_066.4, { valorRedondeo: 1 }),
+    ).toEqual({ precioEstandar: 2_346, precioPremium: 2_666 })
+  })
 })
 
 describe('calcularSobres', () => {

@@ -1,4 +1,9 @@
-import { CONFIGURACION_PREDETERMINADA, obtenerPorcentajeManoObra } from './configuracion'
+import {
+  CONFIGURACION_PREDETERMINADA,
+  MANO_OBRA_MAXIMA,
+  MANO_OBRA_MINIMA,
+  obtenerPorcentajeManoObra,
+} from './configuracion'
 import type { Configuracion, TipoElaboracion } from './modelos'
 
 export interface DatosInsumo {
@@ -23,6 +28,7 @@ export interface ResultadoCostoReceta {
 export interface OpcionesPreciosSugeridos {
   multiplicadorEstandar?: number
   multiplicadorPremium?: number
+  valorRedondeo?: number
 }
 
 export interface ResultadoPreciosSugeridos {
@@ -46,9 +52,6 @@ export interface ResultadoSobres {
   alertaSueldo: boolean
 }
 
-const PORCENTAJE_MANO_OBRA_MINIMO = 0.2
-const PORCENTAJE_MANO_OBRA_MAXIMO = 0.3
-const VALOR_REDONDEO = 1_000
 
 function validarNumero(nombre: string, valor: number): void {
   if (!Number.isFinite(valor)) {
@@ -107,8 +110,9 @@ export function calcularCostoReceta({
   }
 }
 
-function redondearAlMillar(valor: number): number {
-  return Math.round(valor / VALOR_REDONDEO) * VALOR_REDONDEO
+// Math.round lleva los empates exactos hacia arriba.
+function redondear(valor: number, valorRedondeo: number): number {
+  return Math.round(valor / valorRedondeo) * valorRedondeo
 }
 
 export function calcularPreciosSugeridos(
@@ -116,15 +120,17 @@ export function calcularPreciosSugeridos(
   {
     multiplicadorEstandar = CONFIGURACION_PREDETERMINADA.multiplicadorEstandar,
     multiplicadorPremium = CONFIGURACION_PREDETERMINADA.multiplicadorPremium,
+    valorRedondeo = CONFIGURACION_PREDETERMINADA.valorRedondeo,
   }: OpcionesPreciosSugeridos = {},
 ): ResultadoPreciosSugeridos {
   validarNoNegativo('El costo por unidad', costoPorUnidad)
   validarPositivo('El multiplicador estándar', multiplicadorEstandar)
   validarPositivo('El multiplicador premium', multiplicadorPremium)
+  validarPositivo('El valor de redondeo', valorRedondeo)
 
   return {
-    precioEstandar: redondearAlMillar(costoPorUnidad * multiplicadorEstandar),
-    precioPremium: redondearAlMillar(costoPorUnidad * multiplicadorPremium),
+    precioEstandar: redondear(costoPorUnidad * multiplicadorEstandar, valorRedondeo),
+    precioPremium: redondear(costoPorUnidad * multiplicadorPremium, valorRedondeo),
   }
 }
 
@@ -142,8 +148,8 @@ export function calcularSobres({
 
   validarNumero('El porcentaje de mano de obra', porcentaje)
   if (
-    porcentaje < PORCENTAJE_MANO_OBRA_MINIMO ||
-    porcentaje > PORCENTAJE_MANO_OBRA_MAXIMO
+    porcentaje < MANO_OBRA_MINIMA ||
+    porcentaje > MANO_OBRA_MAXIMA
   ) {
     throw new Error('El porcentaje de mano de obra debe estar entre 20% y 30%.')
   }
@@ -187,6 +193,7 @@ export function calcularPrecioVenta({
   const precios = calcularPreciosSugeridos(costoPorUnidad, {
     multiplicadorEstandar: configuracion.multiplicadorEstandar,
     multiplicadorPremium: configuracion.multiplicadorPremium,
+    valorRedondeo: configuracion.valorRedondeo,
   })
   const precioUsado = precioVentaReal ?? precios.precioEstandar
 

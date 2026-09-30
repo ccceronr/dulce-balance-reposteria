@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
+import Ajustes from './componentes/Ajustes'
 import Cajas from './componentes/Cajas'
 import Inventario from './componentes/Inventario'
 import Recetas from './componentes/Recetas'
 import Ventas from './componentes/Ventas'
 import type {
   ArticuloInventario,
+  Configuracion,
   DatosAplicacion,
   PresentacionVenta,
   Receta,
@@ -13,6 +15,8 @@ import type {
 import { cargarDatos, guardarDatos } from './lib/persistencia'
 
 type VistaPrincipal = 'inventario' | 'recetas' | 'cajas' | 'ventas'
+// Ajustes no es una pestaña: se abre desde la barra superior.
+type Vista = VistaPrincipal | 'ajustes'
 
 const PESTANAS: { vista: VistaPrincipal; etiqueta: string }[] = [
   { vista: 'inventario', etiqueta: 'Inventario' },
@@ -29,7 +33,8 @@ function reemplazarOAgregar<T extends { id: string }>(lista: T[], elemento: T): 
 
 function App() {
   const [datos, setDatos] = useState<DatosAplicacion>(() => cargarDatos())
-  const [vistaPrincipal, setVistaPrincipal] = useState<VistaPrincipal>('inventario')
+  const [vistaPrincipal, setVistaPrincipal] = useState<Vista>('inventario')
+  const [vistaAnterior, setVistaAnterior] = useState<VistaPrincipal>('inventario')
   const [errorGuardado, setErrorGuardado] = useState('')
 
   useEffect(() => {
@@ -99,6 +104,17 @@ function App() {
     }))
   }
 
+  function guardarConfiguracion(configuracion: Configuracion) {
+    setDatos((actuales) => ({ ...actuales, configuracion }))
+  }
+
+  function abrirAjustes() {
+    if (vistaPrincipal !== 'ajustes') {
+      setVistaAnterior(vistaPrincipal)
+      setVistaPrincipal('ajustes')
+    }
+  }
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -109,9 +125,21 @@ function App() {
             <small>REPOSTERÍA ARTESANAL</small>
           </span>
         </a>
-        <div className="topbar-status">
-          <span className={`status-dot${errorGuardado ? ' has-error' : ''}`} />
-          {errorGuardado ? 'Error al guardar' : 'Guardado local'}
+        <div className="topbar-actions">
+          <div className="topbar-status">
+            <span className={`status-dot${errorGuardado ? ' has-error' : ''}`} />
+            <span className="topbar-status-text">
+              {errorGuardado ? 'Error al guardar' : 'Guardado local'}
+            </span>
+          </div>
+          <button
+            aria-pressed={vistaPrincipal === 'ajustes'}
+            className="button button-quiet settings-button"
+            onClick={abrirAjustes}
+            type="button"
+          >
+            <span aria-hidden="true">⚙</span> Ajustes
+          </button>
         </div>
       </header>
 
@@ -161,6 +189,13 @@ function App() {
             onIrARecetas={() => setVistaPrincipal('recetas')}
             presentaciones={datos.presentaciones}
             recetas={datos.recetas}
+          />
+        )}
+        {vistaPrincipal === 'ajustes' && (
+          <Ajustes
+            configuracion={datos.configuracion}
+            onGuardarConfiguracion={guardarConfiguracion}
+            onVolver={() => setVistaPrincipal(vistaAnterior)}
           />
         )}
         {vistaPrincipal === 'ventas' && (

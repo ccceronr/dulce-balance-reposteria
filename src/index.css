@@ -1154,6 +1154,56 @@ select:focus-visible {
   color: #a3324a;
 }
 
+/* Barra superior y ajustes */
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.settings-button {
+  min-height: 38px;
+  padding: 0.45rem 0.8rem;
+}
+
+.settings-button[aria-pressed="true"] {
+  border-color: var(--rosa-principal);
+  background: var(--rosa-claro);
+  color: var(--rosa-oscuro);
+}
+
+.settings-panel {
+  margin-top: 0;
+}
+
+.settings-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 1.1rem 1rem;
+}
+
+.settings-note,
+.settings-message {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.settings-note {
+  color: #8c777b;
+  font-size: 0.75rem;
+}
+
+.inline-notice.is-success {
+  border-color: var(--menta);
+  background: #eef3ee;
+  color: #45604c;
+}
+
+.settings-form .form-actions {
+  grid-column: 1 / -1;
+}
+
 /* Ventas */
 .sale-form {
   display: grid;
@@ -1498,6 +1548,29 @@ select:focus-visible {
 
   .sale-form .form-actions {
     grid-column: 1 / -1;
+  }
+
+  .settings-form {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-form .form-actions {
+    grid-column: 1;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .topbar-actions {
+    gap: 0.5rem;
+  }
+
+  /* En pantallas pequeñas solo queda el punto de estado; el texto sigue disponible para lectores de pantalla. */
+  .topbar-status-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .sales-envelopes {

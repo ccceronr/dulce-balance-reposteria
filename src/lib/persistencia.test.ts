@@ -55,6 +55,35 @@ describe('persistencia local', () => {
     expect(cargarDatos(almacenamiento)).toEqual(datos)
   })
 
+  it('conserva los datos guardados antes de que existiera el redondeo configurable', () => {
+    const almacenamiento = crearAlmacenamiento()
+    const { valorRedondeo: _omitido, ...configuracionAntigua } = crearDatosIniciales().configuracion
+    almacenamiento.setItem(CLAVE_DATOS, JSON.stringify({
+      version: 1,
+      datos: {
+        ...crearDatosIniciales(),
+        recetas: [],
+        inventario: [
+          {
+            id: 'huevos',
+            nombre: 'Huevos',
+            tipo: 'ingrediente',
+            precioCompra: 21_000,
+            cantidadTotalComprada: 30,
+            unidad: 'unidad',
+          },
+        ],
+        configuracion: { ...configuracionAntigua, porcentajeIndirectos: 0.12 },
+      },
+    }))
+
+    const datos = cargarDatos(almacenamiento)
+
+    expect(datos.inventario).toHaveLength(1)
+    expect(datos.configuracion.porcentajeIndirectos).toBe(0.12)
+    expect(datos.configuracion.valorRedondeo).toBe(1_000)
+  })
+
   it('recupera datos iniciales si el JSON está dañado o tiene una versión inválida', () => {
     const almacenamiento = crearAlmacenamiento()
     almacenamiento.setItem(CLAVE_DATOS, '{"version":999,"inventario":[]}')
