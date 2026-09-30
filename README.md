@@ -2,6 +2,17 @@
 
 Aplicación web mobile-first para calcular costos, precios de venta y la distribución del dinero en tres bolsillos para un negocio de repostería artesanal. Funciona en el navegador y guarda los datos solo en el dispositivo. Las fórmulas y decisiones del producto están documentadas en [CLAUDE.md](CLAUDE.md).
 
+**App publicada:** https://dulce-balance-reposteria.vercel.app
+
+## Instalar en el celular
+
+La app es una PWA: se instala en la pantalla de inicio y funciona sin conexión.
+
+- **Android (Chrome):** abrir la dirección y tocar **⋮ → Instalar app**.
+- **iPhone (Safari):** abrir la dirección y tocar **Compartir → Agregar a pantalla de inicio**.
+
+Los datos se guardan solo en el dispositivo. Para pasarlos a otro teléfono o protegerlos, usa **Ajustes → Exportar respaldo** e **Importar respaldo**.
+
 ## Funcionalidades
 
 - **Inventario**: ingredientes (en g, ml o unidades) y empaques (por unidad), con su precio de compra y la cantidad comprada.
@@ -41,6 +52,20 @@ npm run build
 npm run preview
 ```
 
+## Íconos
+
+El ícono se genera a partir de `public/icono.svg`:
+
+```bash
+npm run iconos
+```
+
+Solo hace falta ejecutarlo si cambia el ícono; los PNG generados se guardan en el repositorio.
+
+## Despliegue
+
+Vercel publica automáticamente cada push a `main`. La app instalada recibe la versión nueva sola: la descarga en la siguiente apertura con internet.
+
 ## Estructura
 
 ```
@@ -52,10 +77,10 @@ src/
 
 ## Tecnologías
 
-Vite, React, TypeScript, Tailwind CSS, Vitest y localStorage.
+Vite, React, TypeScript, Tailwind CSS, Vitest, vite-plugin-pwa (service worker y manifest), localStorage y Vercel.
 
 ## Estado
 
-Fases completadas: estructura base, cálculos, persistencia, inventario, recetas, resultados y bolsillos, cajas mixtas, historial de ventas, configuración y respaldo.
+Fases completadas: estructura base, cálculos, persistencia, inventario, recetas, resultados y bolsillos, cajas mixtas, historial de ventas, configuración y respaldo, PWA instalable sin conexión y despliegue en Vercel.
 
-Pendiente: convertirla en una PWA instalable y con funcionamiento sin conexión (Fase 8) y desplegarla en Vercel (Fase 9).
+Próximo: modo oscuro automático según la configuración del teléfono.
