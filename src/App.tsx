@@ -1,10 +1,22 @@
 import { useEffect, useState } from 'react'
+import Cajas from './componentes/Cajas'
 import Inventario from './componentes/Inventario'
 import Recetas from './componentes/Recetas'
-import type { ArticuloInventario, DatosAplicacion, Receta } from './lib/modelos'
+import type {
+  ArticuloInventario,
+  DatosAplicacion,
+  PresentacionVenta,
+  Receta,
+} from './lib/modelos'
 import { cargarDatos, guardarDatos } from './lib/persistencia'
 
-type VistaPrincipal = 'inventario' | 'recetas'
+type VistaPrincipal = 'inventario' | 'recetas' | 'cajas'
+
+const PESTANAS: { vista: VistaPrincipal; etiqueta: string }[] = [
+  { vista: 'inventario', etiqueta: 'Inventario' },
+  { vista: 'recetas', etiqueta: 'Recetas' },
+  { vista: 'cajas', etiqueta: 'Cajas' },
+]
 
 function reemplazarOAgregar<T extends { id: string }>(lista: T[], elemento: T): T[] {
   return lista.some((actual) => actual.id === elemento.id)
@@ -54,6 +66,22 @@ function App() {
     }))
   }
 
+  function guardarPresentacion(presentacion: PresentacionVenta) {
+    setDatos((actuales) => ({
+      ...actuales,
+      presentaciones: reemplazarOAgregar(actuales.presentaciones, presentacion),
+    }))
+  }
+
+  function eliminarPresentacion(presentacionId: string) {
+    setDatos((actuales) => ({
+      ...actuales,
+      presentaciones: actuales.presentaciones.filter(
+        (presentacion) => presentacion.id !== presentacionId,
+      ),
+    }))
+  }
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -72,27 +100,21 @@ function App() {
 
       <main className="inventory-page">
         <nav aria-label="Secciones principales" className="section-tabs" role="tablist">
-          <button
-            aria-selected={vistaPrincipal === 'inventario'}
-            className={vistaPrincipal === 'inventario' ? 'is-active' : ''}
-            onClick={() => setVistaPrincipal('inventario')}
-            role="tab"
-            type="button"
-          >
-            Inventario
-          </button>
-          <button
-            aria-selected={vistaPrincipal === 'recetas'}
-            className={vistaPrincipal === 'recetas' ? 'is-active' : ''}
-            onClick={() => setVistaPrincipal('recetas')}
-            role="tab"
-            type="button"
-          >
-            Recetas
-          </button>
+          {PESTANAS.map(({ vista, etiqueta }) => (
+            <button
+              aria-selected={vistaPrincipal === vista}
+              className={vistaPrincipal === vista ? 'is-active' : ''}
+              key={vista}
+              onClick={() => setVistaPrincipal(vista)}
+              role="tab"
+              type="button"
+            >
+              {etiqueta}
+            </button>
+          ))}
         </nav>
 
-        {vistaPrincipal === 'inventario' ? (
+        {vistaPrincipal === 'inventario' && (
           <Inventario
             estadoGuardado={errorGuardado || 'Guardado localmente'}
             inventario={datos.inventario}
@@ -101,13 +123,25 @@ function App() {
             presentaciones={datos.presentaciones}
             recetas={datos.recetas}
           />
-        ) : (
+        )}
+        {vistaPrincipal === 'recetas' && (
           <Recetas
             configuracion={datos.configuracion}
             inventario={datos.inventario}
             onEliminar={eliminarReceta}
             onGuardar={guardarReceta}
             onIrAInventario={() => setVistaPrincipal('inventario')}
+            presentaciones={datos.presentaciones}
+            recetas={datos.recetas}
+          />
+        )}
+        {vistaPrincipal === 'cajas' && (
+          <Cajas
+            configuracion={datos.configuracion}
+            inventario={datos.inventario}
+            onEliminar={eliminarPresentacion}
+            onGuardar={guardarPresentacion}
+            onIrARecetas={() => setVistaPrincipal('recetas')}
             presentaciones={datos.presentaciones}
             recetas={datos.recetas}
           />

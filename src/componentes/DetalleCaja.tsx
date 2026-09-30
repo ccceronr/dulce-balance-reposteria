@@ -1,43 +1,46 @@
 import PrecioYSobres from './PrecioYSobres'
 import { FORMATO_COP, FORMATO_PORCENTAJE } from '../lib/formato'
-import type { ArticuloInventario, Configuracion, Receta } from '../lib/modelos'
-import { calcularResultadoReceta } from '../lib/recetas'
+import type { ArticuloInventario, Configuracion, PresentacionVenta, Receta } from '../lib/modelos'
+import { calcularResultadoPresentacion } from '../lib/presentaciones'
 
-interface DetalleRecetaProps {
-  receta: Receta
+interface DetalleCajaProps {
+  caja: PresentacionVenta
   inventario: ArticuloInventario[]
+  recetas: Receta[]
   configuracion: Configuracion
   onCambiarPrecio: (precioVentaReal: number | undefined) => void
   onEditar: () => void
   onVolver: () => void
 }
 
-function DetalleReceta({
-  receta,
+function DetalleCaja({
+  caja,
   inventario,
+  recetas,
   configuracion,
   onCambiarPrecio,
   onEditar,
   onVolver,
-}: DetalleRecetaProps) {
-  const resultado = calcularResultadoReceta(receta, inventario, configuracion)
+}: DetalleCajaProps) {
+  const resultado = calcularResultadoPresentacion(caja, { inventario, recetas }, configuracion)
+  const unidades = caja.productos.reduce((total, producto) => total + producto.cantidad, 0)
 
   return (
     <section aria-labelledby="detail-title" className="recipe-detail">
       <div className="page-heading">
         <div>
           <button className="text-action detail-back" onClick={onVolver} type="button">
-            ← Volver a recetas
+            ← Volver a cajas
           </button>
           <p className="eyebrow"><span /> Costos y sobres</p>
-          <h1 id="detail-title">{receta.nombre}</h1>
+          <h1 id="detail-title">{caja.nombre}</h1>
           <p className="page-description">
-            {receta.rendimiento} unidades por tanda ·{' '}
-            {receta.tipoElaboracion === 'rapida' ? 'Elaboración rápida' : 'Elaboración elaborada'}
+            {unidades} unidades ·{' '}
+            {caja.tipoElaboracion === 'rapida' ? 'Elaboración rápida' : 'Elaboración elaborada'}
           </p>
         </div>
         <button className="button button-secondary" onClick={onEditar} type="button">
-          Editar receta
+          Editar caja
         </button>
       </div>
 
@@ -45,17 +48,14 @@ function DetalleReceta({
         <p aria-live="assertive" className="inline-error">{resultado.error}</p>
       ) : (
         <>
-          <section aria-label="Costo de producción" className="detail-costs">
+          <section aria-label="Costo de la caja" className="detail-costs">
             <div className="cost-figure">
-              <span>Costo por unidad</span>
-              <strong>{FORMATO_COP.format(resultado.costoPorUnidad)}</strong>
-            </div>
-            <div className="cost-figure">
-              <span>Costo de la tanda</span>
-              <strong>{FORMATO_COP.format(resultado.costoTanda)}</strong>
+              <span>Costo de la caja</span>
+              <strong>{FORMATO_COP.format(resultado.costoCaja)}</strong>
             </div>
             <p className="cost-breakdown">
-              Insumos {FORMATO_COP.format(resultado.insumosDirectos)} + gastos extras{' '}
+              Productos {FORMATO_COP.format(resultado.costoProductos)} + empaques exteriores{' '}
+              {FORMATO_COP.format(resultado.costoEmpaques)} + gastos extras{' '}
               {FORMATO_PORCENTAJE.format(configuracion.porcentajeIndirectos)}{' '}
               {FORMATO_COP.format(resultado.gastosExtras)}
             </p>
@@ -63,13 +63,12 @@ function DetalleReceta({
 
           <PrecioYSobres
             configuracion={configuracion}
-            costo={resultado.costoPorUnidad}
+            costo={resultado.costoCaja}
             onCambiarPrecio={onCambiarPrecio}
-            precioVentaReal={receta.precioVentaReal}
-            tanda={{ rendimiento: receta.rendimiento, sobres: resultado.sobresTanda }}
-            tipoElaboracion={receta.tipoElaboracion}
-            unidad="unidad"
-            venta={{ ...resultado, sobres: resultado.sobresUnidad }}
+            precioVentaReal={caja.precioVentaReal}
+            tipoElaboracion={caja.tipoElaboracion}
+            unidad="caja"
+            venta={resultado}
           />
         </>
       )}
@@ -77,4 +76,4 @@ function DetalleReceta({
   )
 }
 
-export default DetalleReceta
+export default DetalleCaja

@@ -191,7 +191,7 @@ function Recetas({
       presentacion.productos.some((producto) => producto.recetaId === receta.id),
     )
     if (estaEnPresentacion) {
-      setError(`No puedes eliminar “${receta.nombre}” porque está incluida en una presentación.`)
+      setError(`No puedes eliminar “${receta.nombre}” porque está incluida en una caja.`)
       return
     }
 

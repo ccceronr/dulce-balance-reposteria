@@ -34,6 +34,7 @@ const presentacion: PresentacionVenta = {
   nombre: 'Caja regalo',
   productos: [],
   empaques: [{ insumoId: 'cinta', cantidad: 1 }],
+  tipoElaboracion: 'elaborada',
 }
 
 const datos = {

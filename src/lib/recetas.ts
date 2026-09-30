@@ -1,11 +1,10 @@
 import {
   calcularCostoReceta,
-  calcularPreciosSugeridos,
-  calcularSobres,
+  calcularPrecioVenta,
+  validarPrecioVentaReal,
   type DatosInsumo,
   type ResultadoSobres,
 } from './calculos'
-import { obtenerPorcentajeManoObra } from './configuracion'
 import type {
   ArticuloInventario,
   Configuracion,
@@ -42,11 +41,9 @@ export function validarReceta(
     return 'El rendimiento debe ser un número entero mayor que cero.'
   }
 
-  if (
-    receta.precioVentaReal !== undefined &&
-    (!Number.isInteger(receta.precioVentaReal) || receta.precioVentaReal < 0)
-  ) {
-    return 'El precio de venta real debe ser un número entero mayor o igual a cero.'
+  const errorPrecio = validarPrecioVentaReal(receta.precioVentaReal)
+  if (errorPrecio) {
+    return errorPrecio
   }
 
   if (receta.ingredientes.length === 0) {
@@ -130,17 +127,11 @@ export function calcularResultadoReceta(
       rendimiento: receta.rendimiento,
       porcentajeIndirectos: configuracion.porcentajeIndirectos,
     })
-    const precios = calcularPreciosSugeridos(costo.costoPorUnidad, {
-      multiplicadorEstandar: configuracion.multiplicadorEstandar,
-      multiplicadorPremium: configuracion.multiplicadorPremium,
-    })
-    const usaPrecioReal = receta.precioVentaReal !== undefined
-    const precioUsado = receta.precioVentaReal ?? precios.precioEstandar
-    const sobresUnidad = calcularSobres({
+    const { sobres: sobresUnidad, ...venta } = calcularPrecioVenta({
       costoPorUnidad: costo.costoPorUnidad,
-      precioVenta: precioUsado,
+      precioVentaReal: receta.precioVentaReal,
       tipoElaboracion: receta.tipoElaboracion,
-      porcentajeManoObra: obtenerPorcentajeManoObra(receta.tipoElaboracion, configuracion),
+      configuracion,
     })
 
     return {
@@ -149,10 +140,7 @@ export function calcularResultadoReceta(
       gastosExtras: costo.gastosExtras,
       costoTanda: costo.costoBaseTotal,
       costoPorUnidad: costo.costoPorUnidad,
-      precioEstandar: precios.precioEstandar,
-      precioPremium: precios.precioPremium,
-      precioUsado,
-      usaPrecioReal,
+      ...venta,
       sobresUnidad,
       sobresTanda: {
         sobreReposicion: sobresUnidad.sobreReposicion * receta.rendimiento,

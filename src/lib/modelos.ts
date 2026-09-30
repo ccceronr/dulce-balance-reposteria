@@ -36,11 +36,14 @@ export interface EmpaquePresentacion {
   cantidad: number
 }
 
+// En la interfaz se llama "caja": combina productos y empaques exteriores.
 export interface PresentacionVenta {
   id: string
   nombre: string
   productos: ArticuloPresentacion[]
   empaques: EmpaquePresentacion[]
+  tipoElaboracion: TipoElaboracion
+  precioVentaReal?: number
 }
 
 export interface Configuracion {

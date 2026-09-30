@@ -1,5 +1,5 @@
 import { CONFIGURACION_PREDETERMINADA, obtenerPorcentajeManoObra } from './configuracion'
-import type { TipoElaboracion } from './modelos'
+import type { Configuracion, TipoElaboracion } from './modelos'
 
 export interface DatosInsumo {
   precioCompra: number
@@ -160,4 +160,56 @@ export function calcularSobres({
     alertaPerdida: precioVenta < costoPorUnidad,
     alertaSueldo: sobreGanancia < 0,
   }
+}
+
+export interface DatosPrecioVenta {
+  costoPorUnidad: number
+  precioVentaReal?: number
+  tipoElaboracion: TipoElaboracion
+  configuracion: Configuracion
+}
+
+export interface ResultadoPrecioVenta {
+  precioEstandar: number
+  precioPremium: number
+  precioUsado: number
+  usaPrecioReal: boolean
+  sobres: ResultadoSobres
+}
+
+// Paso común a productos y cajas: precios sugeridos, precio usado y reparto en sobres.
+export function calcularPrecioVenta({
+  costoPorUnidad,
+  precioVentaReal,
+  tipoElaboracion,
+  configuracion,
+}: DatosPrecioVenta): ResultadoPrecioVenta {
+  const precios = calcularPreciosSugeridos(costoPorUnidad, {
+    multiplicadorEstandar: configuracion.multiplicadorEstandar,
+    multiplicadorPremium: configuracion.multiplicadorPremium,
+  })
+  const precioUsado = precioVentaReal ?? precios.precioEstandar
+
+  return {
+    ...precios,
+    precioUsado,
+    usaPrecioReal: precioVentaReal !== undefined,
+    sobres: calcularSobres({
+      costoPorUnidad,
+      precioVenta: precioUsado,
+      tipoElaboracion,
+      porcentajeManoObra: obtenerPorcentajeManoObra(tipoElaboracion, configuracion),
+    }),
+  }
+}
+
+export function validarPrecioVentaReal(precioVentaReal: number | undefined): string | null {
+  if (
+    precioVentaReal !== undefined &&
+    (!Number.isInteger(precioVentaReal) || precioVentaReal < 0)
+  ) {
+    return 'El precio de venta real debe ser un número entero mayor o igual a cero.'
+  }
+
+  return null
 }

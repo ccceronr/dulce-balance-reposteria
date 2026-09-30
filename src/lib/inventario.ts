@@ -41,7 +41,7 @@ export function validarArticulo(
     articuloActual.tipo !== articulo.tipo &&
     articuloEstaEnUso(articulo.id, datos)
   ) {
-    return 'No puedes cambiar el tipo de un ingrediente o empaque asociado a una receta o presentación.'
+    return 'No puedes cambiar el tipo de un ingrediente o empaque asociado a una receta o caja.'
   }
 
   return null

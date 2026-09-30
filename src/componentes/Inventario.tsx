@@ -120,7 +120,7 @@ function Inventario({
 
   function eliminarArticulo(articulo: ArticuloInventario) {
     if (estaEnUso(articulo.id)) {
-      setError(`No puedes eliminar “${articulo.nombre}” porque está asociado a una receta o presentación.`)
+      setError(`No puedes eliminar “${articulo.nombre}” porque está asociado a una receta o caja.`)
       return
     }
 
