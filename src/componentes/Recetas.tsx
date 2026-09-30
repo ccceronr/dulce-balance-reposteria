@@ -431,7 +431,7 @@ function Recetas({
           {recetas.map((receta) => (
             <article className="recipe-row" key={receta.id}>
               <button
-                aria-label={`Ver costos y sobres de ${receta.nombre}`}
+                aria-label={`Ver costos y bolsillos de ${receta.nombre}`}
                 className="recipe-row-name"
                 onClick={() => setRecetaDetalle(receta.id)}
                 type="button"

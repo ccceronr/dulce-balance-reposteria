@@ -142,7 +142,7 @@ function Ventas({
     { icono: '📦', titulo: 'Reposición de insumos', valor: resumen.sobres.sobreReposicion },
     { icono: '🔨', titulo: 'Sueldo mano de obra', valor: resumen.sobres.sobreSueldo },
     { icono: '💰', titulo: 'Ganancia limpia empresa', valor: resumen.sobres.sobreGanancia },
-    { icono: '💡', titulo: 'Dinero libre al bolsillo', valor: resumen.sobres.dineroLibre, destacado: true },
+    { icono: '💡', titulo: 'Dinero libre', valor: resumen.sobres.dineroLibre, destacado: true },
   ]
 
   return (
@@ -151,7 +151,7 @@ function Ventas({
         <div>
           <p className="eyebrow"><span /> Historial</p>
           <h1 id="sales-title">Ventas</h1>
-          <p className="page-description">Registra lo que vendes y cuánto va a cada sobre.</p>
+          <p className="page-description">Registra lo que vendes y cuánto va a cada bolsillo.</p>
         </div>
         <button
           className="button button-primary"
@@ -349,7 +349,7 @@ function Ventas({
           <h2>Sin ventas este mes</h2>
           <p>
             {hayCatalogo
-              ? 'Registra una venta para ver cuánto va a cada sobre.'
+              ? 'Registra una venta para ver cuánto va a cada bolsillo.'
               : 'Primero crea una receta o una caja para poder registrar ventas.'}
           </p>
         </div>

@@ -377,7 +377,7 @@ function Cajas({
             return (
               <article className="recipe-row" key={caja.id}>
                 <button
-                  aria-label={`Ver costos y sobres de ${caja.nombre}`}
+                  aria-label={`Ver costos y bolsillos de ${caja.nombre}`}
                   className="recipe-row-name"
                   onClick={() => setCajaDetalle(caja.id)}
                   type="button"

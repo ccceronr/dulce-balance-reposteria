@@ -29,7 +29,7 @@ function DetalleReceta({
           <button className="text-action detail-back" onClick={onVolver} type="button">
             ← Volver a recetas
           </button>
-          <p className="eyebrow"><span /> Costos y sobres</p>
+          <p className="eyebrow"><span /> Costos y bolsillos</p>
           <h1 id="detail-title">{receta.nombre}</h1>
           <p className="page-description">
             {receta.rendimiento} unidades por tanda ·{' '}

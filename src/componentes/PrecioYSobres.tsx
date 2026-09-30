@@ -16,7 +16,7 @@ interface PrecioYSobresProps {
   onCambiarPrecio: (precioVentaReal: number | undefined) => void
 }
 
-// Precios sugeridos, precio real editable, alertas y tarjetas de sobres; lo comparten recetas y cajas.
+// Precios sugeridos, precio real editable, alertas y tarjetas de bolsillos; lo comparten recetas y cajas.
 function PrecioYSobres({
   venta,
   costo,
@@ -70,25 +70,25 @@ function PrecioYSobres({
   const sobres = [
     {
       icono: '📦',
-      titulo: 'Sobre 1 · Reposición de insumos',
+      titulo: 'Bolsillo 1 · Reposición de insumos',
       valor: venta.sobres.sobreReposicion,
       tanda: tanda?.sobres.sobreReposicion,
     },
     {
       icono: '🔨',
-      titulo: `Sobre 2 · Sueldo mano de obra (${FORMATO_PORCENTAJE.format(porcentajeManoObra)})`,
+      titulo: `Bolsillo 2 · Sueldo mano de obra (${FORMATO_PORCENTAJE.format(porcentajeManoObra)})`,
       valor: venta.sobres.sobreSueldo,
       tanda: tanda?.sobres.sobreSueldo,
     },
     {
       icono: '💰',
-      titulo: 'Sobre 3 · Ganancia limpia empresa',
+      titulo: 'Bolsillo 3 · Ganancia limpia empresa',
       valor: venta.sobres.sobreGanancia,
       tanda: tanda?.sobres.sobreGanancia,
     },
     {
       icono: '💡',
-      titulo: 'Total dinero libre al bolsillo',
+      titulo: 'Dinero libre',
       valor: venta.sobres.dineroLibre,
       tanda: tanda?.sobres.dineroLibre,
       destacado: true,
@@ -155,7 +155,7 @@ function PrecioYSobres({
 
       <section aria-labelledby="envelopes-title" className="detail-block">
         <h2 id="envelopes-title">
-          Reparto en sobres · {FORMATO_COP.format(venta.precioUsado)} por {unidad}
+          Reparto en bolsillos · {FORMATO_COP.format(venta.precioUsado)} por {unidad}
         </h2>
         <div className="envelopes">
           {sobres.map((sobre) => (

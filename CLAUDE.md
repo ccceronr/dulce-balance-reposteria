@@ -74,6 +74,8 @@ Sobre_Ganancia   = P_venta - (Sobre_Reposicion + Sobre_Sueldo)
 Dinero_Libre     = Sobre_Sueldo + Sobre_Ganancia
 ```
 
+> **Nomenclatura:** en la interfaz y en el README los sobres se llaman **bolsillos** ("Bolsillo 1 · Reposición de insumos", etc.) y el total se llama **"Dinero libre"**. En el código se mantienen los nombres `sobre…` (`calcularSobres`, `sobreReposicion`, etc.).
+
 ### E. Validaciones y alertas
 
 - Si `P_venta < Costo_Por_Unidad` → alerta roja: se está vendiendo a pérdida.

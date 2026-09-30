@@ -32,7 +32,7 @@ function DetalleCaja({
           <button className="text-action detail-back" onClick={onVolver} type="button">
             ← Volver a cajas
           </button>
-          <p className="eyebrow"><span /> Costos y sobres</p>
+          <p className="eyebrow"><span /> Costos y bolsillos</p>
           <h1 id="detail-title">{caja.nombre}</h1>
           <p className="page-description">
             {unidades} unidades ·{' '}
