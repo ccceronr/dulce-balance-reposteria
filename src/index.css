@@ -2,8 +2,8 @@
 
 :root {
   font-family: "Avenir Next", Avenir, ui-sans-serif, system-ui, sans-serif;
-  color: #513b40;
-  background: #fff9f8;
+  color: var(--color-texto);
+  background: var(--color-fondo);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -11,14 +11,47 @@
   font-optical-sizing: auto;
   font-weight: 400;
 
+  /* Paleta: todos los colores de la interfaz salen de estas variables. */
+  --color-fondo: #fff9f8;
+  --color-fondo-barra: rgb(255 249 248 / 85%);
+  --color-fondo-degradado: rgb(248 231 233 / 34%);
+  --color-superficie: #fff;
+  --color-superficie-translucida: rgb(255 255 255 / 82%);
+  --color-superficie-suave: #fcf4f4;
+  --color-rosa-tenue: #f7e9eb;
+
+  --color-texto: #513b40;
+  --color-texto-medio: #604b50;
+  --color-texto-secundario: #806d71;
+  --color-texto-tenue: #8c777b;
+  --color-texto-desactivado: #a69094;
+
+  --color-linea: #eadedd;
+  --color-linea-suave: #eee4e4;
+  --color-linea-fuerte: #ddcecf;
+
   --rosa-principal: #b85d77;
-  --rosa-oscuro: #8f405a;
   --rosa-claro: #f8e7e9;
-  --rosa-palido: #fff9f8;
-  --ciruela: #513b40;
+  --color-acento: #8f405a;
+  --color-enlace: #855b67;
+  --color-boton: #b85d77;
+  --color-boton-hover: #8f405a;
+  --color-boton-texto: #fff;
+  --color-foco: rgb(184 93 119 / 25%);
+  --color-sombra: rgb(81 59 64 / 12%);
   --coral: #dc927e;
   --menta: #839887;
-  --linea: #eadedd;
+
+  --color-peligro: #a34c5d;
+  --color-peligro-borde: #bc3f52;
+  --color-peligro-fondo: #fde8ea;
+  --color-peligro-texto: #8a2c3d;
+  --color-aviso-borde: #d19a3a;
+  --color-aviso-fondo: #fdf3df;
+  --color-aviso-texto: #7a5518;
+  --color-exito-fondo: #eaf0e9;
+  --color-exito-texto: #526d5b;
+
   --fuente-editorial: "Bodoni MT", "Didot", "Bodoni 72", "Times New Roman", serif;
 }
 
@@ -56,8 +89,8 @@ a {
   min-height: 100vh;
   flex-direction: column;
   background:
-    linear-gradient(135deg, transparent 0 78%, rgb(248 231 233 / 34%) 78% 100%),
-    var(--rosa-palido);
+    linear-gradient(135deg, transparent 0 78%, var(--color-fondo-degradado) 78% 100%),
+    var(--color-fondo);
 }
 
 .topbar,
@@ -70,8 +103,8 @@ a {
 
 .topbar {
   min-height: 78px;
-  border-bottom: 1px solid var(--linea);
-  background: rgb(255 249 248 / 85%);
+  border-bottom: 1px solid var(--color-linea);
+  background: var(--color-fondo-barra);
 }
 
 .brand {
@@ -88,7 +121,7 @@ a {
 }
 
 .brand-mark-circle {
-  fill: #fff;
+  fill: var(--color-superficie);
   stroke: var(--rosa-principal);
 }
 
@@ -100,7 +133,7 @@ a {
 }
 
 .brand-name small {
-  color: #92777c;
+  color: var(--color-texto-tenue);
   font-family: "Avenir Next", Avenir, ui-sans-serif, system-ui, sans-serif;
   font-size: 0.56rem;
   font-weight: 650;
@@ -110,7 +143,7 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #77676a;
+  color: var(--color-texto-secundario);
   font-size: 0.78rem;
 }
 
@@ -122,7 +155,7 @@ a {
 }
 
 .status-dot.has-error {
-  background: #b64d62;
+  background: var(--color-peligro);
 }
 
 .inventory-page {
@@ -136,7 +169,7 @@ a {
   display: flex;
   gap: 1.6rem;
   margin-bottom: 2rem;
-  border-bottom: 1px solid var(--linea);
+  border-bottom: 1px solid var(--color-linea);
 }
 
 .section-tabs button {
@@ -145,13 +178,13 @@ a {
   border: 0;
   padding: 0.4rem 0.15rem;
   background: transparent;
-  color: #806d71;
+  color: var(--color-texto-secundario);
   font-size: 0.8rem;
   font-weight: 600;
 }
 
 .section-tabs button.is-active {
-  color: var(--rosa-oscuro);
+  color: var(--color-acento);
 }
 
 .section-tabs button.is-active::after {
@@ -168,7 +201,7 @@ a {
 .segmented-control button:focus-visible,
 .add-line:focus-visible,
 .remove-line:focus-visible {
-  outline: 3px solid rgb(184 93 119 / 25%);
+  outline: 3px solid var(--color-foco);
   outline-offset: 2px;
 }
 
@@ -202,7 +235,7 @@ a {
 .editor-heading h2,
 .empty-state h2 {
   margin: 0;
-  color: var(--ciruela);
+  color: var(--color-texto);
   font-family: var(--fuente-editorial);
   font-weight: 400;
 }
@@ -214,7 +247,7 @@ a {
 
 .page-description {
   margin: 0.8rem 0 0;
-  color: #806d71;
+  color: var(--color-texto-secundario);
   font-size: 0.9rem;
 }
 
@@ -241,17 +274,17 @@ a {
 .text-action:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 3px solid rgb(184 93 119 / 25%);
+  outline: 3px solid var(--color-foco);
   outline-offset: 2px;
 }
 
 .button-primary {
-  background: var(--rosa-principal);
-  color: white;
+  background: var(--color-boton);
+  color: var(--color-boton-texto);
 }
 
 .button-primary:hover {
-  background: var(--rosa-oscuro);
+  background: var(--color-boton-hover);
 }
 
 .button-primary > span {
@@ -261,24 +294,24 @@ select:focus-visible {
 }
 
 .button-secondary {
-  border-color: #dfc6ca;
-  background: #fff;
-  color: var(--rosa-oscuro);
+  border-color: var(--color-linea-fuerte);
+  background: var(--color-superficie);
+  color: var(--color-acento);
 }
 
 .button-secondary:hover {
   border-color: var(--rosa-principal);
-  background: #fff6f7;
+  background: var(--color-superficie-suave);
 }
 
 .button-quiet {
-  border-color: var(--linea);
+  border-color: var(--color-linea);
   background: transparent;
-  color: #725e62;
+  color: var(--color-texto-secundario);
 }
 
 .button-quiet:hover {
-  background: #fff;
+  background: var(--color-superficie);
 }
 
 .inventory-summary {
@@ -286,7 +319,7 @@ select:focus-visible {
   min-height: 88px;
   align-items: center;
   gap: clamp(1.3rem, 5vw, 4rem);
-  border-block: 1px solid var(--linea);
+  border-block: 1px solid var(--color-linea);
 }
 
 .summary-item {
@@ -297,13 +330,13 @@ select:focus-visible {
 }
 
 .summary-number {
-  color: var(--ciruela);
+  color: var(--color-texto);
   font-family: var(--fuente-editorial);
   font-size: 1.65rem;
 }
 
 .summary-label {
-  color: #806d71;
+  color: var(--color-texto-secundario);
   font-size: 0.75rem;
 }
 
@@ -322,19 +355,19 @@ select:focus-visible {
 .inline-error {
   display: block;
   margin: 1rem 0 0;
-  border-left: 3px solid #bc5267;
+  border-left: 3px solid var(--color-peligro-borde);
   padding: 0.55rem 0.8rem;
-  background: #fff0f1;
-  color: #85374b;
+  background: var(--color-peligro-fondo);
+  color: var(--color-peligro-texto);
   font-size: 0.8rem;
 }
 
 .inline-notice {
   margin: 1rem 0 0;
-  border-left: 3px solid #d19a3a;
+  border-left: 3px solid var(--color-aviso-borde);
   padding: 0.55rem 0.8rem;
-  background: #fdf3df;
-  color: #7a5518;
+  background: var(--color-aviso-fondo);
+  color: var(--color-aviso-texto);
   font-size: 0.8rem;
 }
 
@@ -344,10 +377,10 @@ select:focus-visible {
 
 .editor-panel {
   margin-top: 1.5rem;
-  border: 1px solid #e4d2d3;
+  border: 1px solid var(--color-linea-fuerte);
   border-radius: 5px;
   padding: clamp(1.15rem, 3vw, 1.8rem);
-  background: rgb(255 255 255 / 82%);
+  background: var(--color-superficie-translucida);
   animation: aparecer 180ms ease-out both;
 }
 
@@ -383,19 +416,19 @@ select:focus-visible {
   display: grid;
   min-width: 0;
   gap: 0.45rem;
-  color: #604b50;
+  color: var(--color-texto-medio);
   font-size: 0.74rem;
   font-weight: 650;
 }
 
 .field > span small {
-  color: #947d81;
+  color: var(--color-texto-tenue);
   font-size: 0.72rem;
   font-weight: 500;
 }
 
 .field-hint {
-  color: #8b6f74;
+  color: var(--color-texto-tenue);
   font-size: 0.68rem;
   font-weight: 400;
 }
@@ -406,10 +439,10 @@ select:focus-visible {
   width: 100%;
   min-width: 0;
   height: 43px;
-  border: 1px solid #ddcecf;
+  border: 1px solid var(--color-linea-fuerte);
   border-radius: 3px;
-  background: white;
-  color: var(--ciruela);
+  background: var(--color-superficie);
+  color: var(--color-texto);
   font-size: 0.82rem;
 }
 
@@ -420,12 +453,12 @@ select:focus-visible {
 
 .field input::placeholder,
 .search-field input::placeholder {
-  color: #a69094;
+  color: var(--color-texto-desactivado);
 }
 
 .field select:disabled {
-  background: #f7f1f1;
-  color: #806d71;
+  background: var(--color-superficie-suave);
+  color: var(--color-texto-secundario);
   cursor: not-allowed;
 }
 
@@ -435,9 +468,9 @@ select:focus-visible {
   height: 43px;
   align-items: center;
   overflow: hidden;
-  border: 1px solid #ddcecf;
+  border: 1px solid var(--color-linea-fuerte);
   border-radius: 3px;
-  background: #fff;
+  background: var(--color-superficie);
 }
 
 .input-with-prefix > span,
@@ -447,8 +480,8 @@ select:focus-visible {
   flex: 0 0 auto;
   place-items: center;
   padding-inline: 0.7rem;
-  background: #fcf4f4;
-  color: #856c71;
+  background: var(--color-superficie-suave);
+  color: var(--color-texto-tenue);
   font-size: 0.75rem;
 }
 
@@ -469,11 +502,11 @@ select:focus-visible {
   height: 100%;
   flex: 0 0 auto;
   border: 0;
-  border-left: 1px solid #eadedd;
+  border-left: 1px solid var(--color-linea);
   border-radius: 0;
   padding-inline: 0.6rem;
-  background: #fcf4f4;
-  color: #856c71;
+  background: var(--color-superficie-suave);
+  color: var(--color-texto-tenue);
   font-size: 0.75rem;
   cursor: pointer;
 }
@@ -490,7 +523,7 @@ select:focus-visible {
   gap: 0.6rem;
   margin-top: 0.25rem;
   padding-top: 1rem;
-  border-top: 1px solid #f0e6e6;
+  border-top: 1px solid var(--color-linea-suave);
 }
 
 .recipe-basics {
@@ -507,7 +540,7 @@ select:focus-visible {
 
 .elaboration-fieldset legend {
   margin-bottom: 0.55rem;
-  color: #604b50;
+  color: var(--color-texto-medio);
   font-size: 0.74rem;
   font-weight: 650;
 }
@@ -515,10 +548,10 @@ select:focus-visible {
 .segmented-control {
   display: inline-grid;
   grid-template-columns: 1fr 1fr;
-  border: 1px solid #ddcecf;
+  border: 1px solid var(--color-linea-fuerte);
   border-radius: 4px;
   padding: 3px;
-  background: #f8f1f1;
+  background: var(--color-superficie-suave);
 }
 
 .segmented-control button {
@@ -532,26 +565,26 @@ select:focus-visible {
   border-radius: 2px;
   padding: 0.4rem 0.7rem;
   background: transparent;
-  color: #806d71;
+  color: var(--color-texto-secundario);
   font-size: 0.76rem;
   font-weight: 600;
 }
 
 .segmented-control button span {
-  color: #9a8186;
+  color: var(--color-texto-tenue);
   font-size: 0.68rem;
   font-weight: 500;
 }
 
 .segmented-control button.is-selected {
-  background: white;
-  box-shadow: 0 1px 3px rgb(81 59 64 / 12%);
-  color: var(--rosa-oscuro);
+  background: var(--color-superficie);
+  box-shadow: 0 1px 3px var(--color-sombra);
+  color: var(--color-acento);
 }
 
 .recipe-section {
   margin-top: 1.5rem;
-  border-top: 1px solid #eee3e3;
+  border-top: 1px solid var(--color-linea-suave);
   padding-top: 1.2rem;
 }
 
@@ -565,7 +598,7 @@ select:focus-visible {
 
 .recipe-section-heading h3 {
   margin: 0;
-  color: var(--ciruela);
+  color: var(--color-texto);
   font-family: var(--fuente-editorial);
   font-size: 1.25rem;
   font-weight: 400;
@@ -573,7 +606,7 @@ select:focus-visible {
 
 .recipe-section-heading p {
   margin: 0.2rem 0 0;
-  color: #8c777b;
+  color: var(--color-texto-tenue);
   font-size: 0.72rem;
 }
 
@@ -611,7 +644,7 @@ select:focus-visible {
   border: 0;
   padding: 0.4rem 0.55rem;
   background: transparent;
-  color: #9a5360;
+  color: var(--color-enlace);
   font-size: 0.71rem;
 }
 
@@ -626,13 +659,13 @@ select:focus-visible {
   border: 0;
   padding: 0.35rem 0.1rem;
   background: transparent;
-  color: var(--rosa-oscuro);
+  color: var(--color-acento);
   font-size: 0.74rem;
   font-weight: 650;
 }
 
 .add-line:disabled {
-  color: #aa9a9d;
+  color: var(--color-texto-desactivado);
   cursor: not-allowed;
 }
 
@@ -641,19 +674,19 @@ select:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  border-top: 1px solid #eee3e3;
+  border-top: 1px solid var(--color-linea-suave);
   padding-top: 1rem;
 }
 
 .recipe-no-ingredients p {
   margin: 0;
-  color: #806d71;
+  color: var(--color-texto-secundario);
   font-size: 0.82rem;
 }
 
 .recipe-list {
   margin-top: 1rem;
-  border-top: 1px solid var(--linea);
+  border-top: 1px solid var(--color-linea);
 }
 
 .recipe-list-heading,
@@ -666,7 +699,7 @@ select:focus-visible {
 
 .recipe-list-heading {
   min-height: 42px;
-  color: #937d81;
+  color: var(--color-texto-tenue);
   font-size: 0.63rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -674,7 +707,7 @@ select:focus-visible {
 
 .recipe-row {
   min-height: 82px;
-  border-top: 1px solid #eee4e4;
+  border-top: 1px solid var(--color-linea-suave);
 }
 
 .recipe-row-name {
@@ -691,8 +724,8 @@ select:focus-visible {
   flex: 0 0 auto;
   place-items: center;
   border-radius: 50%;
-  background: #f7e7e9;
-  color: var(--rosa-oscuro);
+  background: var(--color-rosa-tenue);
+  color: var(--color-acento);
   font-family: var(--fuente-editorial);
 }
 
@@ -704,13 +737,13 @@ select:focus-visible {
 }
 
 .recipe-row-name:hover .recipe-row-title {
-  color: var(--rosa-oscuro);
+  color: var(--color-acento);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .recipe-row-name:focus-visible {
-  outline: 3px solid rgb(184 93 119 / 25%);
+  outline: 3px solid var(--color-foco);
   outline-offset: 2px;
 }
 
@@ -718,7 +751,7 @@ select:focus-visible {
   display: block;
   overflow-wrap: anywhere;
   margin: 0;
-  color: var(--ciruela);
+  color: var(--color-texto);
   font-size: 0.84rem;
   font-weight: 650;
 }
@@ -726,12 +759,12 @@ select:focus-visible {
 .recipe-row-meta {
   display: block;
   margin: 0.25rem 0 0;
-  color: #8c777b;
+  color: var(--color-texto-tenue);
   font-size: 0.67rem;
 }
 
 .recipe-row-yield {
-  color: #645358;
+  color: var(--color-texto-medio);
   font-size: 0.76rem;
   font-variant-numeric: tabular-nums;
 }
@@ -740,14 +773,14 @@ select:focus-visible {
   width: fit-content;
   border-radius: 2px;
   padding: 0.35rem 0.5rem;
-  background: #f7e9eb;
-  color: #8c4a5e;
+  background: var(--color-rosa-tenue);
+  color: var(--color-acento);
   font-size: 0.66rem;
 }
 
 .recipe-type.elaborada {
-  background: #eaf0e9;
-  color: #526d5b;
+  background: var(--color-exito-fondo);
+  color: var(--color-exito-texto);
 }
 
 .recipe-row-actions {
@@ -787,7 +820,7 @@ select:focus-visible {
   border: 0;
   padding: 0.4rem 0;
   background: transparent;
-  color: #806d71;
+  color: var(--color-texto-secundario);
   font-size: 0.77rem;
   white-space: nowrap;
 }
@@ -799,13 +832,13 @@ select:focus-visible {
   place-items: center;
   border-radius: 10px;
   padding-inline: 0.3rem;
-  background: #f3e9e9;
-  color: #806d71;
+  background: var(--color-superficie-suave);
+  color: var(--color-texto-secundario);
   font-size: 0.65rem;
 }
 
 .filter-tab.is-active {
-  color: var(--rosa-oscuro);
+  color: var(--color-acento);
   font-weight: 700;
 }
 
@@ -825,8 +858,8 @@ select:focus-visible {
   height: 38px;
   align-items: center;
   gap: 0.45rem;
-  border-bottom: 1px solid #d8c8ca;
-  color: #92787d;
+  border-bottom: 1px solid var(--color-linea-fuerte);
+  color: var(--color-texto-tenue);
 }
 
 .search-field > span {
@@ -843,7 +876,7 @@ select:focus-visible {
 
 .inventory-table-wrap {
   overflow-x: auto;
-  border-top: 1px solid var(--linea);
+  border-top: 1px solid var(--color-linea);
 }
 
 .inventory-table {
@@ -854,7 +887,7 @@ select:focus-visible {
 
 .inventory-table th {
   height: 43px;
-  color: #937d81;
+  color: var(--color-texto-tenue);
   font-size: 0.64rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -862,8 +895,8 @@ select:focus-visible {
 
 .inventory-table td {
   height: 68px;
-  border-top: 1px solid #eee4e4;
-  color: #645358;
+  border-top: 1px solid var(--color-linea-suave);
+  color: var(--color-texto-medio);
   font-size: 0.79rem;
 }
 
@@ -880,7 +913,7 @@ select:focus-visible {
 }
 
 .inventory-table td:first-child strong {
-  color: var(--ciruela);
+  color: var(--color-texto);
   font-weight: 650;
 }
 
@@ -896,27 +929,27 @@ select:focus-visible {
 }
 
 .item-mark.ingrediente {
-  background: #f7e7e9;
-  color: var(--rosa-oscuro);
+  background: var(--color-rosa-tenue);
+  color: var(--color-acento);
 }
 
 .item-mark.empaque {
-  background: #eaf0e9;
-  color: #526d5b;
+  background: var(--color-exito-fondo);
+  color: var(--color-exito-texto);
 }
 
 .type-label {
   display: inline-block;
   border-radius: 2px;
   padding: 0.33rem 0.5rem;
-  background: #f7e9eb;
-  color: #8c4a5e;
+  background: var(--color-rosa-tenue);
+  color: var(--color-acento);
   font-size: 0.66rem;
 }
 
 .type-label.empaque {
-  background: #eaf0e9;
-  color: #526d5b;
+  background: var(--color-exito-fondo);
+  color: var(--color-exito-texto);
 }
 
 .numeric-cell {
@@ -932,19 +965,19 @@ select:focus-visible {
   border: 0;
   padding: 0.4rem 0.5rem;
   background: transparent;
-  color: #855b67;
+  color: var(--color-enlace);
   font-size: 0.73rem;
   font-weight: 650;
 }
 
 .text-action:hover {
-  color: var(--rosa-oscuro);
+  color: var(--color-acento);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .text-action-danger {
-  color: #a34c5d;
+  color: var(--color-peligro);
 }
 
 .empty-state {
@@ -969,7 +1002,7 @@ select:focus-visible {
 
 .empty-state p {
   margin: 0.5rem 0 1.2rem;
-  color: #806d71;
+  color: var(--color-texto-secundario);
   font-size: 0.83rem;
 }
 
@@ -985,8 +1018,8 @@ select:focus-visible {
 
 .footer {
   min-height: 54px;
-  border-top: 1px solid var(--linea);
-  color: #947d81;
+  border-top: 1px solid var(--color-linea);
+  color: var(--color-texto-tenue);
   font-size: 0.61rem;
   font-weight: 650;
 }
@@ -1010,7 +1043,7 @@ select:focus-visible {
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.8rem clamp(1.3rem, 5vw, 4rem);
-  border-block: 1px solid var(--linea);
+  border-block: 1px solid var(--color-linea);
   padding-block: 1.2rem;
 }
 
@@ -1021,12 +1054,12 @@ select:focus-visible {
 
 .cost-figure span,
 .price-option span {
-  color: #806d71;
+  color: var(--color-texto-secundario);
   font-size: 0.72rem;
 }
 
 .cost-figure strong {
-  color: var(--ciruela);
+  color: var(--color-texto);
   font-family: var(--fuente-editorial);
   font-size: 1.9rem;
   font-weight: 400;
@@ -1035,7 +1068,7 @@ select:focus-visible {
 .cost-breakdown {
   flex-basis: 100%;
   margin: 0;
-  color: #8c777b;
+  color: var(--color-texto-tenue);
   font-size: 0.72rem;
 }
 
@@ -1045,7 +1078,7 @@ select:focus-visible {
 
 .detail-block h2 {
   margin: 0 0 0.9rem;
-  color: var(--ciruela);
+  color: var(--color-texto);
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -1060,16 +1093,16 @@ select:focus-visible {
 .price-option {
   display: grid;
   gap: 0.3rem;
-  border: 1px solid #e4d2d3;
+  border: 1px solid var(--color-linea-fuerte);
   border-radius: 5px;
   padding: 0.9rem 1rem;
-  background: #fff;
+  background: var(--color-superficie);
   text-align: left;
   transition: border-color 140ms ease, background-color 140ms ease;
 }
 
 .price-option strong {
-  color: var(--ciruela);
+  color: var(--color-texto);
   font-family: var(--fuente-editorial);
   font-size: 1.45rem;
   font-weight: 400;
@@ -1081,7 +1114,7 @@ select:focus-visible {
 }
 
 .price-option:focus-visible {
-  outline: 3px solid rgb(184 93 119 / 25%);
+  outline: 3px solid var(--color-foco);
   outline-offset: 2px;
 }
 
@@ -1099,15 +1132,15 @@ select:focus-visible {
 }
 
 .detail-alert.is-danger {
-  border-color: #bc3f52;
-  background: #fde8ea;
-  color: #8a2c3d;
+  border-color: var(--color-peligro-borde);
+  background: var(--color-peligro-fondo);
+  color: var(--color-peligro-texto);
 }
 
 .detail-alert.is-warning {
-  border-color: #d19a3a;
-  background: #fdf3df;
-  color: #7a5518;
+  border-color: var(--color-aviso-borde);
+  background: var(--color-aviso-fondo);
+  color: var(--color-aviso-texto);
 }
 
 .envelopes {
@@ -1119,28 +1152,28 @@ select:focus-visible {
 .envelope {
   display: grid;
   gap: 0.35rem;
-  border: 1px solid #eadedd;
+  border: 1px solid var(--color-linea);
   border-radius: 5px;
   padding: 0.9rem 1rem;
-  background: rgb(255 255 255 / 82%);
+  background: var(--color-superficie-translucida);
 }
 
 .envelope h3 {
   margin: 0;
-  color: #725e62;
+  color: var(--color-texto-secundario);
   font-size: 0.72rem;
   font-weight: 650;
 }
 
 .envelope strong {
-  color: var(--ciruela);
+  color: var(--color-texto);
   font-family: var(--fuente-editorial);
   font-size: 1.5rem;
   font-weight: 400;
 }
 
 .envelope-batch {
-  color: #8c777b;
+  color: var(--color-texto-tenue);
   font-size: 0.7rem;
 }
 
@@ -1150,7 +1183,7 @@ select:focus-visible {
 }
 
 .envelope.is-negative strong {
-  color: #a3324a;
+  color: var(--color-peligro);
 }
 
 /* Barra superior y ajustes */
@@ -1168,7 +1201,7 @@ select:focus-visible {
 .settings-button[aria-pressed="true"] {
   border-color: var(--rosa-principal);
   background: var(--rosa-claro);
-  color: var(--rosa-oscuro);
+  color: var(--color-acento);
 }
 
 .settings-panel {
@@ -1189,14 +1222,14 @@ select:focus-visible {
 }
 
 .settings-note {
-  color: #8c777b;
+  color: var(--color-texto-tenue);
   font-size: 0.75rem;
 }
 
 .inline-notice.is-success {
   border-color: var(--menta);
-  background: #eef3ee;
-  color: #45604c;
+  background: var(--color-exito-fondo);
+  color: var(--color-exito-texto);
 }
 
 .settings-form .form-actions {
@@ -1232,7 +1265,7 @@ select:focus-visible {
   border-radius: 5px;
   padding: 0.8rem 1rem;
   background: var(--rosa-claro);
-  color: #725e62;
+  color: var(--color-texto-secundario);
   font-size: 0.78rem;
 }
 
@@ -1241,7 +1274,7 @@ select:focus-visible {
 }
 
 .sale-preview strong {
-  color: var(--ciruela);
+  color: var(--color-texto);
   font-family: var(--fuente-editorial);
   font-size: 1.3rem;
   font-weight: 400;
@@ -1277,7 +1310,7 @@ select:focus-visible {
 }
 
 .sale-total {
-  color: var(--ciruela);
+  color: var(--color-texto);
   font-weight: 650;
 }
 
@@ -1336,7 +1369,7 @@ select:focus-visible {
 
   .recipe-row-actions {
     justify-content: start;
-    border-top: 1px solid #f0e7e7;
+    border-top: 1px solid var(--color-linea-suave);
     padding-top: 0.3rem;
   }
 }
@@ -1446,10 +1479,10 @@ select:focus-visible {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 0.2rem 0.75rem;
     margin-bottom: 0.7rem;
-    border: 1px solid #eadedd;
+    border: 1px solid var(--color-linea);
     border-radius: 4px;
     padding: 0.7rem 0.8rem;
-    background: rgb(255 255 255 / 75%);
+    background: var(--color-superficie-translucida);
   }
 
   .inventory-table td,
@@ -1471,7 +1504,7 @@ select:focus-visible {
 
   .inventory-table td:not(:first-child):not(.actions-cell)::before {
     margin-right: 0.35rem;
-    color: #947d81;
+    color: var(--color-texto-tenue);
     content: attr(data-label) ":";
     font-size: 0.64rem;
   }
@@ -1492,7 +1525,7 @@ select:focus-visible {
     grid-column: 1 / -1;
     justify-content: end;
     margin-top: 0.25rem;
-    border-top: 1px solid #f0e7e7;
+    border-top: 1px solid var(--color-linea-suave);
     padding-top: 0.45rem;
   }
 
