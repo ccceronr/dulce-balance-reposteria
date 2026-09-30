@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest'
 import {
   CLAVE_DATOS,
   crearDatosIniciales,
+  crearRespaldo,
   cargarDatos,
   guardarDatos,
+  interpretarRespaldo,
+  nombreArchivoRespaldo,
 } from './persistencia'
 import type { DatosAplicacion } from './modelos'
 
@@ -92,5 +95,63 @@ describe('persistencia local', () => {
 
     almacenamiento.setItem(CLAVE_DATOS, 'no es json')
     expect(cargarDatos(almacenamiento)).toEqual(crearDatosIniciales())
+  })
+})
+
+describe('respaldo JSON', () => {
+  const datos: DatosAplicacion = {
+    ...crearDatosIniciales(),
+    inventario: [
+      {
+        id: 'huevos',
+        nombre: 'Huevos',
+        tipo: 'ingrediente',
+        precioCompra: 21_000,
+        cantidadTotalComprada: 30,
+        unidad: 'unidad',
+      },
+    ],
+    configuracion: { ...crearDatosIniciales().configuracion, valorRedondeo: 500 },
+  }
+  const fecha = new Date('2026-09-29T15:30:00Z')
+
+  it('exporta e importa exactamente los mismos datos', () => {
+    const resultado = interpretarRespaldo(crearRespaldo(datos, fecha))
+
+    expect(resultado.ok).toBe(true)
+    if (resultado.ok) {
+      expect(resultado.datos).toEqual(datos)
+      expect(resultado.exportadoEn).toBe('2026-09-29T15:30:00.000Z')
+    }
+  })
+
+  it('nombra el archivo con la fecha', () => {
+    expect(nombreArchivoRespaldo(new Date(2026, 8, 29))).toBe('dulce-balance-respaldo-2026-09-29.json')
+  })
+
+  it('rechaza archivos que no son un respaldo válido', () => {
+    expect(interpretarRespaldo('no es json').ok).toBe(false)
+    expect(interpretarRespaldo('{"hola":1}').ok).toBe(false)
+    expect(interpretarRespaldo(JSON.stringify({ version: 999, datos })).ok).toBe(false)
+
+    const configuracionInvalida = JSON.stringify({
+      version: 1,
+      datos: { ...datos, configuracion: { ...datos.configuracion, porcentajeManoObraRapida: 0.9 } },
+    })
+    const resultado = interpretarRespaldo(configuracionInvalida)
+    expect(resultado.ok).toBe(false)
+    if (!resultado.ok) {
+      expect(resultado.error).toContain('respaldo')
+    }
+  })
+
+  it('completa los campos nuevos en respaldos antiguos', () => {
+    const { valorRedondeo: _omitido, ...configuracionAntigua } = datos.configuracion
+    const resultado = interpretarRespaldo(
+      JSON.stringify({ version: 1, datos: { ...datos, configuracion: configuracionAntigua } }),
+    )
+
+    expect(resultado.ok && resultado.datos.configuracion.valorRedondeo).toBe(1_000)
+    expect(resultado.ok && resultado.exportadoEn).toBeNull()
   })
 })

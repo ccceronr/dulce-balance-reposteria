@@ -1,11 +1,12 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import {
   CONFIGURACION_PREDETERMINADA,
   OPCIONES_REDONDEO,
   validarConfiguracion,
 } from '../lib/configuracion'
 import { FORMATO_COP } from '../lib/formato'
-import type { Configuracion } from '../lib/modelos'
+import type { Configuracion, DatosAplicacion } from '../lib/modelos'
+import { crearRespaldo, interpretarRespaldo, nombreArchivoRespaldo } from '../lib/persistencia'
 
 interface FormularioAjustes {
   porcentajeIndirectos: string
@@ -17,10 +18,16 @@ interface FormularioAjustes {
 }
 
 interface AjustesProps {
-  configuracion: Configuracion
+  datos: DatosAplicacion
   onGuardarConfiguracion: (configuracion: Configuracion) => void
+  onImportarDatos: (datos: DatosAplicacion) => void
   onVolver: () => void
 }
+
+const FORMATO_FECHA_RESPALDO = new Intl.DateTimeFormat('es-CO', {
+  dateStyle: 'long',
+  timeStyle: 'short',
+})
 
 // En pantalla los porcentajes se escriben como 10, 20, 25; se guardan como fracción.
 function aPorcentaje(fraccion: number): string {
@@ -53,10 +60,13 @@ function etiquetaRedondeo(valor: number): string {
   return valor === 1 ? 'Sin redondeo (al peso)' : `Al ${FORMATO_COP.format(valor)} más cercano`
 }
 
-function Ajustes({ configuracion, onGuardarConfiguracion, onVolver }: AjustesProps) {
-  const [formulario, setFormulario] = useState<FormularioAjustes>(() => aFormulario(configuracion))
+function Ajustes({ datos, onGuardarConfiguracion, onImportarDatos, onVolver }: AjustesProps) {
+  const [formulario, setFormulario] = useState<FormularioAjustes>(() => aFormulario(datos.configuracion))
   const [error, setError] = useState('')
   const [aviso, setAviso] = useState('')
+  const [errorRespaldo, setErrorRespaldo] = useState('')
+  const [avisoRespaldo, setAvisoRespaldo] = useState('')
+  const selectorArchivo = useRef<HTMLInputElement>(null)
 
   function cambiar(campo: keyof FormularioAjustes, valor: string) {
     setFormulario((actual) => ({ ...actual, [campo]: valor }))
@@ -88,6 +98,50 @@ function Ajustes({ configuracion, onGuardarConfiguracion, onVolver }: AjustesPro
     onGuardarConfiguracion(predeterminada)
     setError('')
     setAviso('Se restauraron los valores por defecto.')
+  }
+
+  function exportarRespaldo() {
+    const archivo = new Blob([crearRespaldo(datos)], { type: 'application/json' })
+    const enlace = document.createElement('a')
+    enlace.href = URL.createObjectURL(archivo)
+    enlace.download = nombreArchivoRespaldo()
+    enlace.click()
+    URL.revokeObjectURL(enlace.href)
+    setErrorRespaldo('')
+    setAvisoRespaldo('Respaldo descargado. Guárdalo en un lugar seguro, como tu correo o la nube.')
+  }
+
+  async function importarRespaldo(evento: ChangeEvent<HTMLInputElement>) {
+    const archivo = evento.target.files?.[0]
+    // Permite volver a elegir el mismo archivo más adelante.
+    evento.target.value = ''
+    if (!archivo) {
+      return
+    }
+
+    setAvisoRespaldo('')
+    const resultado = interpretarRespaldo(await archivo.text())
+    if (!resultado.ok) {
+      setErrorRespaldo(resultado.error)
+      return
+    }
+
+    const fechaRespaldo = resultado.exportadoEn
+      ? ` (${FORMATO_FECHA_RESPALDO.format(new Date(resultado.exportadoEn))})`
+      : ''
+    const confirmado = window.confirm(
+      `Esto reemplazará tu inventario, recetas, cajas, ventas y configuración actuales por los del respaldo${fechaRespaldo}. ¿Continuar?`,
+    )
+    if (!confirmado) {
+      return
+    }
+
+    onImportarDatos(resultado.datos)
+    setFormulario(aFormulario(resultado.datos.configuracion))
+    setError('')
+    setAviso('')
+    setErrorRespaldo('')
+    setAvisoRespaldo('Respaldo importado. Tus datos fueron reemplazados.')
   }
 
   function campoPorcentaje(
@@ -226,6 +280,41 @@ function Ajustes({ configuracion, onGuardarConfiguracion, onVolver }: AjustesPro
             </button>
           </div>
         </form>
+      </section>
+
+      <section aria-labelledby="backup-title" className="editor-panel settings-panel">
+        <div className="editor-heading">
+          <div>
+            <p className="eyebrow"><span /> Seguridad</p>
+            <h2 id="backup-title">Respaldo</h2>
+          </div>
+        </div>
+
+        <p className="settings-note backup-note">
+          Tus datos viven solo en este dispositivo. Si se borra el navegador, se pierden.
+          Descarga un respaldo de vez en cuando y guárdalo fuera del teléfono.
+        </p>
+
+        {errorRespaldo && <p aria-live="assertive" className="inline-error">{errorRespaldo}</p>}
+        {avisoRespaldo && <p aria-live="polite" className="inline-notice is-success">{avisoRespaldo}</p>}
+
+        <div className="form-actions backup-actions">
+          <button className="button button-quiet" onClick={() => selectorArchivo.current?.click()} type="button">
+            Importar respaldo
+          </button>
+          <button className="button button-primary" onClick={exportarRespaldo} type="button">
+            Exportar respaldo
+          </button>
+        </div>
+        <input
+          accept="application/json,.json"
+          aria-label="Archivo de respaldo"
+          className="visually-hidden"
+          onChange={importarRespaldo}
+          ref={selectorArchivo}
+          tabIndex={-1}
+          type="file"
+        />
       </section>
     </section>
   )

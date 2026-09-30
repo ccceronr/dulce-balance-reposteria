@@ -193,8 +193,9 @@ function App() {
         )}
         {vistaPrincipal === 'ajustes' && (
           <Ajustes
-            configuracion={datos.configuracion}
+            datos={datos}
             onGuardarConfiguracion={guardarConfiguracion}
+            onImportarDatos={setDatos}
             onVolver={() => setVistaPrincipal(vistaAnterior)}
           />
         )}

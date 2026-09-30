@@ -1,4 +1,4 @@
-import { CONFIGURACION_PREDETERMINADA } from './configuracion'
+import { CONFIGURACION_PREDETERMINADA, validarConfiguracion } from './configuracion'
 import type { DatosAplicacion } from './modelos'
 
 export const CLAVE_DATOS = 'dulce-balance:datos'
@@ -8,6 +8,15 @@ interface DatosAlmacenados {
   version: number
   datos: DatosAplicacion
 }
+
+// El respaldo usa la misma envoltura que el almacenamiento local, más la fecha de exportación.
+interface Respaldo extends DatosAlmacenados {
+  exportadoEn: string
+}
+
+export type ResultadoRespaldo =
+  | { ok: true; datos: DatosAplicacion; exportadoEn: string | null }
+  | { ok: false; error: string }
 
 export function crearDatosIniciales(): DatosAplicacion {
   return {
@@ -49,6 +58,15 @@ function completarDatos(datos: DatosAplicacion): DatosAplicacion {
   }
 }
 
+// Valida una envoltura { version, datos } ya leída de JSON; devuelve null si no es válida.
+function leerEnvoltura(valor: unknown): DatosAplicacion | null {
+  if (!esObjeto(valor) || valor.version !== VERSION_ESQUEMA || !esDatosAplicacion(valor.datos)) {
+    return null
+  }
+
+  return completarDatos(valor.datos)
+}
+
 function obtenerAlmacenamiento(almacenamiento?: Storage): Storage {
   if (almacenamiento) {
     return almacenamiento
@@ -68,16 +86,7 @@ export function cargarDatos(almacenamiento?: Storage): DatosAplicacion {
       return crearDatosIniciales()
     }
 
-    const almacenado: unknown = JSON.parse(contenido)
-    if (
-      !esObjeto(almacenado) ||
-      almacenado.version !== VERSION_ESQUEMA ||
-      !esDatosAplicacion(almacenado.datos)
-    ) {
-      return crearDatosIniciales()
-    }
-
-    return completarDatos(almacenado.datos)
+    return leerEnvoltura(JSON.parse(contenido)) ?? crearDatosIniciales()
   } catch {
     return crearDatosIniciales()
   }
@@ -97,4 +106,47 @@ export function guardarDatos(datos: DatosAplicacion, almacenamiento?: Storage): 
   } catch {
     throw new Error('No fue posible guardar los datos en este dispositivo.')
   }
+}
+
+export function crearRespaldo(datos: DatosAplicacion, fecha = new Date()): string {
+  const respaldo: Respaldo = {
+    version: VERSION_ESQUEMA,
+    exportadoEn: fecha.toISOString(),
+    datos,
+  }
+
+  return JSON.stringify(respaldo, null, 2)
+}
+
+export function nombreArchivoRespaldo(fecha = new Date()): string {
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0')
+  const dia = String(fecha.getDate()).padStart(2, '0')
+  return `dulce-balance-respaldo-${fecha.getFullYear()}-${mes}-${dia}.json`
+}
+
+export function interpretarRespaldo(texto: string): ResultadoRespaldo {
+  const errorArchivo = 'El archivo no es un respaldo válido de Dulce Balance.'
+
+  let contenido: unknown
+  try {
+    contenido = JSON.parse(texto)
+  } catch {
+    return { ok: false, error: errorArchivo }
+  }
+
+  const datos = leerEnvoltura(contenido)
+  if (!datos) {
+    return { ok: false, error: errorArchivo }
+  }
+
+  const errorConfiguracion = validarConfiguracion(datos.configuracion)
+  if (errorConfiguracion) {
+    return { ok: false, error: `El respaldo tiene una configuración inválida: ${errorConfiguracion}` }
+  }
+
+  const exportadoEn = esObjeto(contenido) && typeof contenido.exportadoEn === 'string'
+    ? contenido.exportadoEn
+    : null
+
+  return { ok: true, datos, exportadoEn }
 }

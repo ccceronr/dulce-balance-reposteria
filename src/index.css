@@ -1204,6 +1204,18 @@ select:focus-visible {
   grid-column: 1 / -1;
 }
 
+.settings-panel + .settings-panel {
+  margin-top: 1.5rem;
+}
+
+.backup-note {
+  margin-bottom: 1rem;
+}
+
+.backup-actions {
+  margin-top: 1rem;
+}
+
 /* Ventas */
 .sale-form {
   display: grid;
