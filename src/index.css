@@ -1072,11 +1072,6 @@ select:focus-visible {
   font-weight: 650;
 }
 
-.footer-flower {
-  color: var(--coral);
-  font-size: 0.95rem;
-}
-
 /* Detalle de receta: costos, precios y sobres */
 .recipe-detail {
   animation: aparecer 180ms ease-out both;

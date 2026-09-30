@@ -240,7 +240,6 @@ function App() {
 
       <footer className="footer">
         <span>COLOMBIA · COP</span>
-        <span className="footer-flower" aria-hidden="true">✳</span>
         <span>VERSIÓN 0.1</span>
       </footer>
     </div>
