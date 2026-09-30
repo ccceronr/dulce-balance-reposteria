@@ -22,6 +22,7 @@ Los datos se guardan solo en el dispositivo. Para pasarlos a otro teléfono o pr
 - **Cajas mixtas**: combinan productos y empaques exteriores, con su propio tipo de elaboración, precios y bolsillos.
 - **Historial de ventas**: productos sueltos y cajas, con el precio cobrado en cada venta y un resumen mensual por bolsillo.
 - **Ajustes**: porcentajes, multiplicadores y redondeo editables, además de la exportación e importación de un respaldo en JSON.
+- **Modo claro y oscuro**: por defecto sigue la configuración del dispositivo; en **Ajustes → Apariencia** se puede fijar en Claro u Oscuro. La preferencia se guarda en cada dispositivo.
 
 Todos los montos están en pesos colombianos (COP). Si cambia el precio de un insumo, las recetas y cajas se recalculan automáticamente. Las ventas registradas conservan los valores del momento en que se hicieron.
 
@@ -81,6 +82,4 @@ Vite, React, TypeScript, Tailwind CSS, Vitest, vite-plugin-pwa (service worker y
 
 ## Estado
 
-Fases completadas: estructura base, cálculos, persistencia, inventario, recetas, resultados y bolsillos, cajas mixtas, historial de ventas, configuración y respaldo, PWA instalable sin conexión y despliegue en Vercel.
-
-Próximo: modo oscuro automático según la configuración del teléfono.
+Fases completadas: estructura base, cálculos, persistencia, inventario, recetas, resultados y bolsillos, cajas mixtas, historial de ventas, configuración y respaldo, PWA instalable sin conexión, despliegue en Vercel y modo claro y oscuro.
