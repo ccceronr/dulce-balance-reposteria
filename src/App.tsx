@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Ajustes from './componentes/Ajustes'
 import Cajas from './componentes/Cajas'
 import Inventario from './componentes/Inventario'
+import LogoMarca from './componentes/LogoMarca'
 import Recetas from './componentes/Recetas'
 import Ventas from './componentes/Ventas'
 import type {
@@ -119,7 +120,7 @@ function App() {
     <div className="app-shell">
       <header className="topbar">
         <a aria-label="Dulce Balance, inicio" className="brand" href="/">
-          <span aria-hidden="true" className="brand-mark">db</span>
+          <LogoMarca className="brand-mark" />
           <span className="brand-name">
             Dulce Balance
             <small>REPOSTERÍA ARTESANAL</small>

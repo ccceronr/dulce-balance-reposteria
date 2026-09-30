@@ -81,16 +81,15 @@ a {
 }
 
 .brand-mark {
-  display: grid;
+  display: block;
   width: 40px;
-  aspect-ratio: 1;
-  place-items: center;
-  border: 1px solid var(--rosa-principal);
-  border-radius: 50%;
-  color: var(--rosa-principal);
-  font-family: var(--fuente-editorial);
-  font-size: 1rem;
-  font-style: italic;
+  height: 40px;
+  flex: 0 0 auto;
+}
+
+.brand-mark-circle {
+  fill: #fff;
+  stroke: var(--rosa-principal);
 }
 
 .brand-name {
