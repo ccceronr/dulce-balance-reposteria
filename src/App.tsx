@@ -14,6 +14,14 @@ import type {
   VentaHistorial,
 } from './lib/modelos'
 import { cargarDatos, guardarDatos } from './lib/persistencia'
+import {
+  aplicarModo,
+  CONSULTA_SISTEMA_OSCURO,
+  guardarPreferenciaTema,
+  leerPreferenciaTema,
+  resolverModo,
+  type PreferenciaTema,
+} from './lib/tema'
 
 type VistaPrincipal = 'inventario' | 'recetas' | 'cajas' | 'ventas'
 // Ajustes no es una pestaña: se abre desde la barra superior.
@@ -37,6 +45,16 @@ function App() {
   const [vistaPrincipal, setVistaPrincipal] = useState<Vista>('inventario')
   const [vistaAnterior, setVistaAnterior] = useState<VistaPrincipal>('inventario')
   const [errorGuardado, setErrorGuardado] = useState('')
+  const [preferenciaTema, setPreferenciaTema] = useState<PreferenciaTema>(() => leerPreferenciaTema())
+
+  // Aplica el modo elegido y, en Automático, sigue los cambios del teléfono o computador.
+  useEffect(() => {
+    const sistema = window.matchMedia(CONSULTA_SISTEMA_OSCURO)
+    const actualizar = () => aplicarModo(resolverModo(preferenciaTema, sistema.matches))
+    actualizar()
+    sistema.addEventListener('change', actualizar)
+    return () => sistema.removeEventListener('change', actualizar)
+  }, [preferenciaTema])
 
   useEffect(() => {
     try {
@@ -103,6 +121,11 @@ function App() {
       ...actuales,
       historialVentas: actuales.historialVentas.filter((venta) => venta.id !== ventaId),
     }))
+  }
+
+  function cambiarPreferenciaTema(preferencia: PreferenciaTema) {
+    guardarPreferenciaTema(preferencia)
+    setPreferenciaTema(preferencia)
   }
 
   function guardarConfiguracion(configuracion: Configuracion) {
@@ -196,8 +219,10 @@ function App() {
           <Ajustes
             datos={datos}
             onGuardarConfiguracion={guardarConfiguracion}
+            onCambiarTema={cambiarPreferenciaTema}
             onImportarDatos={setDatos}
             onVolver={() => setVistaPrincipal(vistaAnterior)}
+            preferenciaTema={preferenciaTema}
           />
         )}
         {vistaPrincipal === 'ventas' && (

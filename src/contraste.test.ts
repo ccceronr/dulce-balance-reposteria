@@ -10,15 +10,16 @@ function leerVariables(bloque: string): Record<string, string> {
   return variables
 }
 
-function extraerBloqueRaiz(css: string, desde: number): string {
-  const inicio = css.indexOf(':root {', desde)
-  const fin = css.indexOf('}', inicio)
-  return css.slice(inicio, fin)
+function extraerBloque(css: string, selector: string): string {
+  const inicio = css.indexOf(`${selector} {`)
+  if (inicio === -1) {
+    return ''
+  }
+  return css.slice(inicio, css.indexOf('}', inicio))
 }
 
-const inicioOscuro = estilos.indexOf('@media (prefers-color-scheme: dark)')
-const claro = leerVariables(extraerBloqueRaiz(estilos, 0))
-const soloOscuro = inicioOscuro === -1 ? {} : leerVariables(extraerBloqueRaiz(estilos, inicioOscuro))
+const claro = leerVariables(extraerBloque(estilos, ':root'))
+const soloOscuro = leerVariables(extraerBloque(estilos, ':root[data-modo="oscuro"]'))
 const oscuro = { ...claro, ...soloOscuro }
 
 function luminancia(hex: string): number {

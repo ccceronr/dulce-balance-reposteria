@@ -3,8 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#fff9f8" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#27201c" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fff9f8" />
+    <script>
+      // Aplica el modo claro u oscuro antes de mostrar la app, para que no parpadee.
+      // Misma lógica que src/lib/tema.ts (clave "dulce-balance:tema").
+      (function () {
+        var preferencia = 'automatico'
+        try {
+          preferencia = localStorage.getItem('dulce-balance:tema') || 'automatico'
+        } catch (error) {}
+        var sistemaOscuro = window.matchMedia('(prefers-color-scheme: dark)').matches
+        var oscuro = preferencia === 'oscuro' || (preferencia !== 'claro' && sistemaOscuro)
+        document.documentElement.dataset.modo = oscuro ? 'oscuro' : 'claro'
+      })()
+    </script>
     <meta name="description" content="Calculadora de costos para repostería artesanal." />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/icono.svg" sizes="any" type="image/svg+xml" />

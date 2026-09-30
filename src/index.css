@@ -10,8 +10,8 @@
   -moz-osx-font-smoothing: grayscale;
   font-optical-sizing: auto;
   font-weight: 400;
-  /* Calendarios, listas desplegables y barras de desplazamiento siguen el modo del sistema. */
-  color-scheme: light dark;
+  /* Calendarios, listas desplegables y barras de desplazamiento siguen el modo activo. */
+  color-scheme: light;
 
   /* Paleta: todos los colores de la interfaz salen de estas variables. */
   --color-fondo: #fff9f8;
@@ -56,50 +56,51 @@
   --fuente-editorial: "Bodoni MT", "Didot", "Bodoni 72", "Times New Roman", serif;
 }
 
-/* Modo oscuro automático ("Café neutro"): fondo café espresso, tarjetas café con leche y texto crema. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-fondo: #27201c;
-    --color-fondo-barra: rgb(39 32 28 / 88%);
-    --color-fondo-degradado: rgb(150 90 60 / 14%);
-    --color-superficie: #473b33;
-    --color-superficie-translucida: rgb(71 59 51 / 92%);
-    --color-superficie-suave: #4f433a;
-    --color-rosa-tenue: #5c3a3b;
+/* Modo oscuro ("Café neutro"): fondo café espresso, tarjetas café con leche y texto crema.
+   Se activa con data-modo="oscuro" en <html>; la app lo pone según la preferencia de Ajustes
+   (Automático sigue al teléfono o al computador). */
+:root[data-modo="oscuro"] {
+  color-scheme: dark;
+  --color-fondo: #27201c;
+  --color-fondo-barra: rgb(39 32 28 / 88%);
+  --color-fondo-degradado: rgb(150 90 60 / 14%);
+  --color-superficie: #473b33;
+  --color-superficie-translucida: rgb(71 59 51 / 92%);
+  --color-superficie-suave: #4f433a;
+  --color-rosa-tenue: #5c3a3b;
 
-    --color-texto: #f5eee5;
-    --color-texto-medio: #e6dbd1;
-    --color-texto-secundario: #c9bfb5;
-    --color-texto-desactivado: #a3988f;
+  --color-texto: #f5eee5;
+  --color-texto-medio: #e6dbd1;
+  --color-texto-secundario: #c9bfb5;
+  --color-texto-desactivado: #a3988f;
 
-    --color-linea: #594d45;
-    --color-linea-suave: #4e433b;
-    --color-linea-fuerte: #6e6158;
+  --color-linea: #594d45;
+  --color-linea-suave: #4e433b;
+  --color-linea-fuerte: #6e6158;
 
-    /* Mismo rosa pastel del botón para títulos, rayas activas y bordes seleccionados. */
-    --rosa-principal: #eba7b9;
-    --rosa-claro: #6a3d46;
-    --color-acento: #f2a8bc;
-    --color-enlace: #e7abbc;
-    /* Botón rosa pastel con texto chocolate: resalta sobre el café y se lee mejor que el blanco. */
-    --color-boton: #eba7b9;
-    --color-boton-hover: #f4c0ce;
-    --color-boton-texto: #2b1f1b;
-    --color-foco: rgb(227 138 163 / 45%);
-    --color-sombra: rgb(0 0 0 / 35%);
-    --coral: #e6a390;
-    --menta: #8fae97;
+  /* Mismo rosa pastel del botón para títulos, rayas activas y bordes seleccionados. */
+  --rosa-principal: #eba7b9;
+  --rosa-claro: #6a3d46;
+  --color-acento: #f2a8bc;
+  --color-enlace: #e7abbc;
+  /* Botón rosa pastel con texto chocolate: resalta sobre el café y se lee mejor que el blanco. */
+  --color-boton: #eba7b9;
+  --color-boton-hover: #f4c0ce;
+  --color-boton-texto: #2b1f1b;
+  --color-foco: rgb(227 138 163 / 45%);
+  --color-sombra: rgb(0 0 0 / 35%);
+  --coral: #e6a390;
+  --menta: #8fae97;
 
-    --color-peligro: #f7a7b0;
-    --color-peligro-borde: #d9566b;
-    --color-peligro-fondo: #43202a;
-    --color-peligro-texto: #ffc6cf;
-    --color-aviso-borde: #d9a445;
-    --color-aviso-fondo: #3a2d16;
-    --color-aviso-texto: #f3d49a;
-    --color-exito-fondo: #1f2e25;
-    --color-exito-texto: #a8cbb1;
-  }
+  --color-peligro: #f7a7b0;
+  --color-peligro-borde: #d9566b;
+  --color-peligro-fondo: #43202a;
+  --color-peligro-texto: #ffc6cf;
+  --color-aviso-borde: #d9a445;
+  --color-aviso-fondo: #3a2d16;
+  --color-aviso-texto: #f3d49a;
+  --color-exito-fondo: #1f2e25;
+  --color-exito-texto: #a8cbb1;
 }
 
 * {
@@ -1281,6 +1282,14 @@ select:focus-visible {
 
 .settings-form .form-actions {
   grid-column: 1 / -1;
+}
+
+.segmented-control.theme-control {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.settings-panel .elaboration-fieldset {
+  margin: 0 0 0.75rem;
 }
 
 .settings-panel + .settings-panel {

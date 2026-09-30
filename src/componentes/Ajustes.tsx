@@ -7,6 +7,7 @@ import {
 import { FORMATO_COP } from '../lib/formato'
 import type { Configuracion, DatosAplicacion } from '../lib/modelos'
 import { crearRespaldo, interpretarRespaldo, nombreArchivoRespaldo } from '../lib/persistencia'
+import type { PreferenciaTema } from '../lib/tema'
 
 interface FormularioAjustes {
   porcentajeIndirectos: string
@@ -19,10 +20,18 @@ interface FormularioAjustes {
 
 interface AjustesProps {
   datos: DatosAplicacion
+  preferenciaTema: PreferenciaTema
+  onCambiarTema: (preferencia: PreferenciaTema) => void
   onGuardarConfiguracion: (configuracion: Configuracion) => void
   onImportarDatos: (datos: DatosAplicacion) => void
   onVolver: () => void
 }
+
+const OPCIONES_TEMA: { valor: PreferenciaTema; etiqueta: string }[] = [
+  { valor: 'automatico', etiqueta: 'Automático' },
+  { valor: 'claro', etiqueta: 'Claro' },
+  { valor: 'oscuro', etiqueta: 'Oscuro' },
+]
 
 const FORMATO_FECHA_RESPALDO = new Intl.DateTimeFormat('es-CO', {
   dateStyle: 'long',
@@ -60,7 +69,14 @@ function etiquetaRedondeo(valor: number): string {
   return valor === 1 ? 'Sin redondeo (al peso)' : `Al ${FORMATO_COP.format(valor)} más cercano`
 }
 
-function Ajustes({ datos, onGuardarConfiguracion, onImportarDatos, onVolver }: AjustesProps) {
+function Ajustes({
+  datos,
+  preferenciaTema,
+  onCambiarTema,
+  onGuardarConfiguracion,
+  onImportarDatos,
+  onVolver,
+}: AjustesProps) {
   const [formulario, setFormulario] = useState<FormularioAjustes>(() => aFormulario(datos.configuracion))
   const [error, setError] = useState('')
   const [aviso, setAviso] = useState('')
@@ -181,9 +197,38 @@ function Ajustes({ datos, onGuardarConfiguracion, onImportarDatos, onVolver }: A
           </button>
           <p className="eyebrow"><span /> Configuración</p>
           <h1 id="settings-title">Ajustes</h1>
-          <p className="page-description">Parámetros que usa la app para calcular costos y precios.</p>
+          <p className="page-description">Apariencia, parámetros de cálculo y respaldo de tus datos.</p>
         </div>
       </div>
+
+      <section aria-labelledby="appearance-title" className="editor-panel settings-panel">
+        <div className="editor-heading">
+          <div>
+            <p className="eyebrow"><span /> Pantalla</p>
+            <h2 id="appearance-title">Apariencia</h2>
+          </div>
+        </div>
+
+        <fieldset className="elaboration-fieldset">
+          <legend>Modo de color</legend>
+          <div className="segmented-control theme-control">
+            {OPCIONES_TEMA.map(({ valor, etiqueta }) => (
+              <button
+                aria-pressed={preferenciaTema === valor}
+                className={preferenciaTema === valor ? 'is-selected' : ''}
+                key={valor}
+                onClick={() => onCambiarTema(valor)}
+                type="button"
+              >
+                {etiqueta}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+        <p className="settings-note theme-note">
+          Automático sigue el modo de tu teléfono o computador. Se guarda solo en este dispositivo.
+        </p>
+      </section>
 
       <section aria-labelledby="parameters-title" className="editor-panel settings-panel">
         <div className="editor-heading">
