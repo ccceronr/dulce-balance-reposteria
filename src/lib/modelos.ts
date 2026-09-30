@@ -61,11 +61,17 @@ export interface DetalleSobreVenta {
   dineroLibre: number
 }
 
+export type TipoVenta = 'producto' | 'caja'
+
+// Copia de los valores al momento de la venta: no cambia si después cambian los costos.
 export interface VentaHistorial {
   id: string
+  // Fecha de la venta en formato AAAA-MM-DD.
   fecha: string
-  presentacionId: string
-  nombrePresentacion: string
+  tipo: TipoVenta
+  // Id de la receta (producto) o de la presentación (caja) vendida.
+  referenciaId: string
+  nombre: string
   cantidad: number
   precioUnitario: number
   costoUnitario: number

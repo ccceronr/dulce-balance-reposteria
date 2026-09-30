@@ -2,20 +2,23 @@ import { useEffect, useState } from 'react'
 import Cajas from './componentes/Cajas'
 import Inventario from './componentes/Inventario'
 import Recetas from './componentes/Recetas'
+import Ventas from './componentes/Ventas'
 import type {
   ArticuloInventario,
   DatosAplicacion,
   PresentacionVenta,
   Receta,
+  VentaHistorial,
 } from './lib/modelos'
 import { cargarDatos, guardarDatos } from './lib/persistencia'
 
-type VistaPrincipal = 'inventario' | 'recetas' | 'cajas'
+type VistaPrincipal = 'inventario' | 'recetas' | 'cajas' | 'ventas'
 
 const PESTANAS: { vista: VistaPrincipal; etiqueta: string }[] = [
   { vista: 'inventario', etiqueta: 'Inventario' },
   { vista: 'recetas', etiqueta: 'Recetas' },
   { vista: 'cajas', etiqueta: 'Cajas' },
+  { vista: 'ventas', etiqueta: 'Ventas' },
 ]
 
 function reemplazarOAgregar<T extends { id: string }>(lista: T[], elemento: T): T[] {
@@ -82,6 +85,20 @@ function App() {
     }))
   }
 
+  function registrarVenta(venta: VentaHistorial) {
+    setDatos((actuales) => ({
+      ...actuales,
+      historialVentas: [...actuales.historialVentas, venta],
+    }))
+  }
+
+  function eliminarVenta(ventaId: string) {
+    setDatos((actuales) => ({
+      ...actuales,
+      historialVentas: actuales.historialVentas.filter((venta) => venta.id !== ventaId),
+    }))
+  }
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -142,6 +159,17 @@ function App() {
             onEliminar={eliminarPresentacion}
             onGuardar={guardarPresentacion}
             onIrARecetas={() => setVistaPrincipal('recetas')}
+            presentaciones={datos.presentaciones}
+            recetas={datos.recetas}
+          />
+        )}
+        {vistaPrincipal === 'ventas' && (
+          <Ventas
+            configuracion={datos.configuracion}
+            historial={datos.historialVentas}
+            inventario={datos.inventario}
+            onEliminar={eliminarVenta}
+            onRegistrar={registrarVenta}
             presentaciones={datos.presentaciones}
             recetas={datos.recetas}
           />

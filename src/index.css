@@ -1154,6 +1154,72 @@ select:focus-visible {
   color: #a3324a;
 }
 
+/* Ventas */
+.sale-form {
+  display: grid;
+  grid-template-columns: minmax(200px, 1.6fr) repeat(3, minmax(130px, 1fr));
+  align-items: start;
+  gap: 1rem;
+}
+
+.sale-preview,
+.sale-error {
+  grid-column: 1 / -1;
+}
+
+.sale-preview {
+  border-radius: 5px;
+  padding: 0.8rem 1rem;
+  background: var(--rosa-claro);
+  color: #725e62;
+  font-size: 0.78rem;
+}
+
+.sale-preview p {
+  margin: 0.2rem 0;
+}
+
+.sale-preview strong {
+  color: var(--ciruela);
+  font-family: var(--fuente-editorial);
+  font-size: 1.3rem;
+  font-weight: 400;
+}
+
+.sale-preview .detail-alert {
+  margin-top: 0.6rem;
+}
+
+.sale-error {
+  margin: 0;
+}
+
+.sales-month {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.sales-month h2 {
+  margin: 0;
+}
+
+.sales-month-field {
+  width: auto;
+}
+
+.sales-envelopes {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 1rem;
+}
+
+.sale-total {
+  color: var(--ciruela);
+  font-weight: 650;
+}
+
 @keyframes aparecer {
   from {
     opacity: 0;
@@ -1167,6 +1233,18 @@ select:focus-visible {
 }
 
 @media (max-width: 760px) {
+  .sale-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sale-item-field {
+    grid-column: 1 / -1;
+  }
+
+  .sales-envelopes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .inventory-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1416,6 +1494,18 @@ select:focus-visible {
   .form-actions .button {
     padding-inline: 0.55rem;
     font-size: 0.75rem;
+  }
+
+  .sale-form .form-actions {
+    grid-column: 1 / -1;
+  }
+
+  .sales-envelopes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sales-envelopes .envelope strong {
+    font-size: 1.25rem;
   }
 
   .footer {
