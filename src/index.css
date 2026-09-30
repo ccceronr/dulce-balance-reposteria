@@ -10,6 +10,8 @@
   -moz-osx-font-smoothing: grayscale;
   font-optical-sizing: auto;
   font-weight: 400;
+  /* Calendarios, listas desplegables y barras de desplazamiento siguen el modo del sistema. */
+  color-scheme: light dark;
 
   /* Paleta: todos los colores de la interfaz salen de estas variables. */
   --color-fondo: #fff9f8;
@@ -22,25 +24,24 @@
 
   --color-texto: #513b40;
   --color-texto-medio: #604b50;
-  --color-texto-secundario: #806d71;
-  --color-texto-tenue: #8c777b;
+  --color-texto-secundario: #756467;
   --color-texto-desactivado: #a69094;
 
   --color-linea: #eadedd;
   --color-linea-suave: #eee4e4;
   --color-linea-fuerte: #ddcecf;
 
-  --rosa-principal: #b85d77;
+  --rosa-principal: #b3526e;
   --rosa-claro: #f8e7e9;
   --color-acento: #8f405a;
   --color-enlace: #855b67;
-  --color-boton: #b85d77;
+  --color-boton: #b3526e;
   --color-boton-hover: #8f405a;
   --color-boton-texto: #fff;
   --color-foco: rgb(184 93 119 / 25%);
   --color-sombra: rgb(81 59 64 / 12%);
   --coral: #dc927e;
-  --menta: #839887;
+  --menta: #7d9382;
 
   --color-peligro: #a34c5d;
   --color-peligro-borde: #bc3f52;
@@ -53,6 +54,52 @@
   --color-exito-texto: #526d5b;
 
   --fuente-editorial: "Bodoni MT", "Didot", "Bodoni 72", "Times New Roman", serif;
+}
+
+/* Modo oscuro automático ("Café neutro"): fondo café espresso, tarjetas café con leche y texto crema. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-fondo: #27201c;
+    --color-fondo-barra: rgb(39 32 28 / 88%);
+    --color-fondo-degradado: rgb(150 90 60 / 14%);
+    --color-superficie: #473b33;
+    --color-superficie-translucida: rgb(71 59 51 / 92%);
+    --color-superficie-suave: #4f433a;
+    --color-rosa-tenue: #5c3a3b;
+
+    --color-texto: #f5eee5;
+    --color-texto-medio: #e6dbd1;
+    --color-texto-secundario: #c9bfb5;
+    --color-texto-desactivado: #a3988f;
+
+    --color-linea: #594d45;
+    --color-linea-suave: #4e433b;
+    --color-linea-fuerte: #6e6158;
+
+    /* Mismo rosa pastel del botón para títulos, rayas activas y bordes seleccionados. */
+    --rosa-principal: #eba7b9;
+    --rosa-claro: #6a3d46;
+    --color-acento: #f2a8bc;
+    --color-enlace: #e7abbc;
+    /* Botón rosa pastel con texto chocolate: resalta sobre el café y se lee mejor que el blanco. */
+    --color-boton: #eba7b9;
+    --color-boton-hover: #f4c0ce;
+    --color-boton-texto: #2b1f1b;
+    --color-foco: rgb(227 138 163 / 45%);
+    --color-sombra: rgb(0 0 0 / 35%);
+    --coral: #e6a390;
+    --menta: #8fae97;
+
+    --color-peligro: #f7a7b0;
+    --color-peligro-borde: #d9566b;
+    --color-peligro-fondo: #43202a;
+    --color-peligro-texto: #ffc6cf;
+    --color-aviso-borde: #d9a445;
+    --color-aviso-fondo: #3a2d16;
+    --color-aviso-texto: #f3d49a;
+    --color-exito-fondo: #1f2e25;
+    --color-exito-texto: #a8cbb1;
+  }
 }
 
 * {
@@ -133,7 +180,7 @@ a {
 }
 
 .brand-name small {
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-family: "Avenir Next", Avenir, ui-sans-serif, system-ui, sans-serif;
   font-size: 0.56rem;
   font-weight: 650;
@@ -342,7 +389,7 @@ select:focus-visible {
 
 .save-status {
   margin-left: auto;
-  color: var(--menta);
+  color: var(--color-exito-texto);
   font-size: 0.72rem;
   text-align: right;
 }
@@ -422,13 +469,13 @@ select:focus-visible {
 }
 
 .field > span small {
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-size: 0.72rem;
   font-weight: 500;
 }
 
 .field-hint {
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-size: 0.68rem;
   font-weight: 400;
 }
@@ -481,7 +528,7 @@ select:focus-visible {
   place-items: center;
   padding-inline: 0.7rem;
   background: var(--color-superficie-suave);
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-size: 0.75rem;
 }
 
@@ -506,7 +553,7 @@ select:focus-visible {
   border-radius: 0;
   padding-inline: 0.6rem;
   background: var(--color-superficie-suave);
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-size: 0.75rem;
   cursor: pointer;
 }
@@ -571,7 +618,7 @@ select:focus-visible {
 }
 
 .segmented-control button span {
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-size: 0.68rem;
   font-weight: 500;
 }
@@ -606,7 +653,7 @@ select:focus-visible {
 
 .recipe-section-heading p {
   margin: 0.2rem 0 0;
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-size: 0.72rem;
 }
 
@@ -699,7 +746,7 @@ select:focus-visible {
 
 .recipe-list-heading {
   min-height: 42px;
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-size: 0.63rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -759,7 +806,7 @@ select:focus-visible {
 .recipe-row-meta {
   display: block;
   margin: 0.25rem 0 0;
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-size: 0.67rem;
 }
 
@@ -859,7 +906,7 @@ select:focus-visible {
   align-items: center;
   gap: 0.45rem;
   border-bottom: 1px solid var(--color-linea-fuerte);
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
 }
 
 .search-field > span {
@@ -887,7 +934,7 @@ select:focus-visible {
 
 .inventory-table th {
   height: 43px;
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-size: 0.64rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -1019,7 +1066,7 @@ select:focus-visible {
 .footer {
   min-height: 54px;
   border-top: 1px solid var(--color-linea);
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-size: 0.61rem;
   font-weight: 650;
 }
@@ -1068,7 +1115,7 @@ select:focus-visible {
 .cost-breakdown {
   flex-basis: 100%;
   margin: 0;
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-size: 0.72rem;
 }
 
@@ -1173,7 +1220,7 @@ select:focus-visible {
 }
 
 .envelope-batch {
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-size: 0.7rem;
 }
 
@@ -1222,7 +1269,7 @@ select:focus-visible {
 }
 
 .settings-note {
-  color: var(--color-texto-tenue);
+  color: var(--color-texto-secundario);
   font-size: 0.75rem;
 }
 
@@ -1504,7 +1551,7 @@ select:focus-visible {
 
   .inventory-table td:not(:first-child):not(.actions-cell)::before {
     margin-right: 0.35rem;
-    color: var(--color-texto-tenue);
+    color: var(--color-texto-secundario);
     content: attr(data-label) ":";
     font-size: 0.64rem;
   }
