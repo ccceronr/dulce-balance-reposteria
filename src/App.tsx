@@ -9,6 +9,7 @@ import type {
   ArticuloInventario,
   Configuracion,
   DatosAplicacion,
+  PreparacionBase,
   PresentacionVenta,
   Receta,
   VentaHistorial,
@@ -90,6 +91,20 @@ function App() {
     setDatos((actuales) => ({
       ...actuales,
       recetas: actuales.recetas.filter((receta) => receta.id !== recetaId),
+    }))
+  }
+
+  function guardarPreparacion(preparacion: PreparacionBase) {
+    setDatos((actuales) => ({
+      ...actuales,
+      preparaciones: reemplazarOAgregar(actuales.preparaciones, preparacion),
+    }))
+  }
+
+  function eliminarPreparacion(preparacionId: string) {
+    setDatos((actuales) => ({
+      ...actuales,
+      preparaciones: actuales.preparaciones.filter((preparacion) => preparacion.id !== preparacionId),
     }))
   }
 
@@ -189,6 +204,7 @@ function App() {
             inventario={datos.inventario}
             onEliminar={eliminarArticulo}
             onGuardar={guardarArticulo}
+            preparaciones={datos.preparaciones}
             presentaciones={datos.presentaciones}
             recetas={datos.recetas}
           />
@@ -198,8 +214,11 @@ function App() {
             configuracion={datos.configuracion}
             inventario={datos.inventario}
             onEliminar={eliminarReceta}
+            onEliminarPreparacion={eliminarPreparacion}
             onGuardar={guardarReceta}
+            onGuardarPreparacion={guardarPreparacion}
             onIrAInventario={() => setVistaPrincipal('inventario')}
+            preparaciones={datos.preparaciones}
             presentaciones={datos.presentaciones}
             recetas={datos.recetas}
           />
@@ -211,6 +230,7 @@ function App() {
             onEliminar={eliminarPresentacion}
             onGuardar={guardarPresentacion}
             onIrARecetas={() => setVistaPrincipal('recetas')}
+            preparaciones={datos.preparaciones}
             presentaciones={datos.presentaciones}
             recetas={datos.recetas}
           />
@@ -232,6 +252,7 @@ function App() {
             inventario={datos.inventario}
             onEliminar={eliminarVenta}
             onRegistrar={registrarVenta}
+            preparaciones={datos.preparaciones}
             presentaciones={datos.presentaciones}
             recetas={datos.recetas}
           />

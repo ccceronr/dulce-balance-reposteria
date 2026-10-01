@@ -4,6 +4,7 @@ import { fechaDeHoy, formatearFecha, FORMATO_COP } from '../lib/formato'
 import type {
   ArticuloInventario,
   Configuracion,
+  PreparacionBase,
   PresentacionVenta,
   Receta,
   TipoVenta,
@@ -23,6 +24,7 @@ interface FormularioVenta {
 
 interface VentasProps {
   inventario: ArticuloInventario[]
+  preparaciones: PreparacionBase[]
   recetas: Receta[]
   presentaciones: PresentacionVenta[]
   configuracion: Configuracion
@@ -42,6 +44,7 @@ function separarSeleccion(seleccion: string): { tipo: TipoVenta; referenciaId: s
 
 function Ventas({
   inventario,
+  preparaciones,
   recetas,
   presentaciones,
   configuracion,
@@ -54,7 +57,7 @@ function Ventas({
   const [mes, setMes] = useState(() => fechaDeHoy().slice(0, 7))
   const [error, setError] = useState('')
 
-  const datos = { inventario, recetas, presentaciones }
+  const datos = { inventario, recetas, presentaciones, preparaciones }
   const hayCatalogo = recetas.length > 0 || presentaciones.length > 0
   const resumen = resumirMes(historial, mes)
 
@@ -78,7 +81,7 @@ function Ventas({
     const caja = tipo === 'caja' ? presentaciones.find((item) => item.id === referenciaId) : undefined
 
     const resultado = receta
-      ? calcularResultadoReceta(receta, inventario, configuracion)
+      ? calcularResultadoReceta(receta, datos, configuracion)
       : caja
         ? calcularResultadoPresentacion(caja, datos, configuracion)
         : null

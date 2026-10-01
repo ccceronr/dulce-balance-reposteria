@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ArticuloInventario, Configuracion, Receta } from './modelos'
+import type { ArticuloInventario, Configuracion, PreparacionBase, Receta } from './modelos'
 import { calcularResultadoReceta, validarReceta } from './recetas'
 
 const inventario: ArticuloInventario[] = [
@@ -21,6 +21,8 @@ const inventario: ArticuloInventario[] = [
   },
 ]
 
+const catalogo = { inventario, preparaciones: [] }
+
 const recetaValida: Receta = {
   id: 'cakecicle',
   nombre: 'Cakecicle',
@@ -32,14 +34,14 @@ const recetaValida: Receta = {
 
 describe('validarReceta', () => {
   it('acepta una receta con ingredientes por tanda y empaque entero por unidad', () => {
-    expect(validarReceta(recetaValida, inventario)).toBeNull()
+    expect(validarReceta(recetaValida, catalogo)).toBeNull()
   })
 
   it('requiere nombre, al menos un ingrediente y rendimiento entero positivo', () => {
-    expect(validarReceta({ ...recetaValida, nombre: ' ' }, inventario)).toContain('nombre')
-    expect(validarReceta({ ...recetaValida, ingredientes: [] }, inventario)).toContain('ingrediente')
-    expect(validarReceta({ ...recetaValida, rendimiento: 0 }, inventario)).toContain('rendimiento')
-    expect(validarReceta({ ...recetaValida, rendimiento: 1.5 }, inventario)).toContain('entero')
+    expect(validarReceta({ ...recetaValida, nombre: ' ' }, catalogo)).toContain('nombre')
+    expect(validarReceta({ ...recetaValida, ingredientes: [] }, catalogo)).toContain('ingrediente')
+    expect(validarReceta({ ...recetaValida, rendimiento: 0 }, catalogo)).toContain('rendimiento')
+    expect(validarReceta({ ...recetaValida, rendimiento: 1.5 }, catalogo)).toContain('entero')
   })
 
   it('rechaza referencias inexistentes o de tipo incorrecto', () => {
@@ -47,13 +49,13 @@ describe('validarReceta', () => {
       validarReceta({
         ...recetaValida,
         ingredientes: [{ insumoId: 'bolsa', cantidadUsada: 1 }],
-      }, inventario),
+      }, catalogo),
     ).toContain('ingredientes')
     expect(
       validarReceta({
         ...recetaValida,
         empaques: [{ insumoId: 'desconocido', cantidadUsada: 1 }],
-      }, inventario),
+      }, catalogo),
     ).toContain('empaques')
   })
 
@@ -62,20 +64,20 @@ describe('validarReceta', () => {
       validarReceta({
         ...recetaValida,
         ingredientes: [{ insumoId: 'chocolate', cantidadUsada: -1 }],
-      }, inventario),
+      }, catalogo),
     ).toContain('positiva')
     expect(
       validarReceta({
         ...recetaValida,
         empaques: [{ insumoId: 'bolsa', cantidadUsada: 0.5 }],
-      }, inventario),
+      }, catalogo),
     ).toContain('entera')
   })
 
   it('acepta un precio real entero no negativo y rechaza los demás', () => {
-    expect(validarReceta({ ...recetaValida, precioVentaReal: 6_000 }, inventario)).toBeNull()
-    expect(validarReceta({ ...recetaValida, precioVentaReal: -1 }, inventario)).toContain('precio')
-    expect(validarReceta({ ...recetaValida, precioVentaReal: 10.5 }, inventario)).toContain('precio')
+    expect(validarReceta({ ...recetaValida, precioVentaReal: 6_000 }, catalogo)).toBeNull()
+    expect(validarReceta({ ...recetaValida, precioVentaReal: -1 }, catalogo)).toContain('precio')
+    expect(validarReceta({ ...recetaValida, precioVentaReal: 10.5 }, catalogo)).toContain('precio')
   })
 })
 
@@ -119,7 +121,11 @@ describe('calcularResultadoReceta', () => {
   }
 
   function calcular(receta: Receta, inventarioActual = inventarioBrownie) {
-    const resultado = calcularResultadoReceta(receta, inventarioActual, configuracion)
+    const resultado = calcularResultadoReceta(
+      receta,
+      { inventario: inventarioActual, preparaciones: [] },
+      configuracion,
+    )
     if (!resultado.ok) {
       throw new Error(resultado.error)
     }
@@ -147,7 +153,7 @@ describe('calcularResultadoReceta', () => {
   it('usa el redondeo de la configuración', () => {
     const resultado = calcularResultadoReceta(
       brownie,
-      inventarioBrownie,
+      { inventario: inventarioBrownie, preparaciones: [] },
       { ...configuracion, valorRedondeo: 100 },
     )
 
@@ -201,7 +207,7 @@ describe('calcularResultadoReceta', () => {
   it('devuelve un error claro si falta un insumo del inventario', () => {
     const resultado = calcularResultadoReceta(
       brownie,
-      inventarioBrownie.filter((articulo) => articulo.id !== 'caja'),
+      { inventario: inventarioBrownie.filter((articulo) => articulo.id !== 'caja'), preparaciones: [] },
       configuracion,
     )
 
@@ -209,5 +215,107 @@ describe('calcularResultadoReceta', () => {
     if (!resultado.ok) {
       expect(resultado.error).toContain('inventario')
     }
+  })
+})
+
+describe('recetas con preparaciones base', () => {
+  const configuracion: Configuracion = {
+    porcentajeIndirectos: 0.1,
+    multiplicadorEstandar: 2.2,
+    multiplicadorPremium: 2.5,
+    porcentajeManoObraRapida: 0.2,
+    porcentajeManoObraElaborada: 0.25,
+    valorRedondeo: 1_000,
+  }
+
+  const inventarioCakecicle: ArticuloInventario[] = [
+    { id: 'harina', nombre: 'Harina', tipo: 'ingrediente', precioCompra: 10_000, cantidadTotalComprada: 1_000, unidad: 'g' },
+    { id: 'leche-condensada', nombre: 'Leche condensada', tipo: 'ingrediente', precioCompra: 20_000, cantidadTotalComprada: 1_000, unidad: 'g' },
+    { id: 'chocolate', nombre: 'Chocolate de cobertura', tipo: 'ingrediente', precioCompra: 40_000, cantidadTotalComprada: 1_000, unidad: 'g' },
+    { id: 'palito', nombre: 'Palito', tipo: 'empaque', precioCompra: 10_000, cantidadTotalComprada: 100, unidad: 'unidad' },
+  ]
+
+  // Masa: $30.000 en ingredientes, pesa 1.500 g -> $20 por g.
+  const masa: PreparacionBase = {
+    id: 'masa',
+    nombre: 'Masa de pastel con leche condensada',
+    ingredientes: [
+      { insumoId: 'harina', cantidadUsada: 1_000 },
+      { insumoId: 'leche-condensada', cantidadUsada: 1_000 },
+    ],
+    rendimientoTotal: 1_500,
+    unidad: 'g',
+  }
+
+  // Cakecicle por unidad: 75 g de masa + 65 g de chocolate + 1 palito.
+  const cakecicle: Receta = {
+    id: 'cakecicle',
+    nombre: 'Cakecicle',
+    ingredientes: [{ insumoId: 'chocolate', cantidadUsada: 65 }],
+    preparaciones: [{ preparacionId: 'masa', cantidadUsada: 75 }],
+    empaques: [{ insumoId: 'palito', cantidadUsada: 1 }],
+    rendimiento: 1,
+    tipoElaboracion: 'elaborada',
+  }
+
+  const catalogoCakecicle = { inventario: inventarioCakecicle, preparaciones: [masa] }
+
+  it('suma la preparación al costo del producto y aplica indirectos una sola vez', () => {
+    const resultado = calcularResultadoReceta(cakecicle, catalogoCakecicle, configuracion)
+
+    expect(resultado.ok).toBe(true)
+    if (resultado.ok) {
+      expect(resultado.insumosDirectos).toBeCloseTo(4_200)
+      expect(resultado.costoPorUnidad).toBeCloseTo(4_620)
+      expect(resultado.precioEstandar).toBe(10_000)
+    }
+  })
+
+  it('se actualiza cuando cambia un ingrediente de la preparación', () => {
+    const inventarioCaro = inventarioCakecicle.map((articulo) =>
+      articulo.id === 'harina' ? { ...articulo, precioCompra: 16_000 } : articulo,
+    )
+    const resultado = calcularResultadoReceta(
+      cakecicle,
+      { inventario: inventarioCaro, preparaciones: [masa] },
+      configuracion,
+    )
+
+    // Masa a $24 por g: 75 g = $1.800; directos $4.500; con 10% = $4.950.
+    expect(resultado.ok && resultado.costoPorUnidad).toBeCloseTo(4_950)
+  })
+
+  it('devuelve un error claro si la preparación ya no existe', () => {
+    const resultado = calcularResultadoReceta(
+      cakecicle,
+      { inventario: inventarioCakecicle, preparaciones: [] },
+      configuracion,
+    )
+
+    expect(resultado.ok).toBe(false)
+    if (!resultado.ok) {
+      expect(resultado.error).toContain('preparaciones base')
+    }
+  })
+
+  it('valida las preparaciones usadas en la receta', () => {
+    const soloMasa = { ...cakecicle, ingredientes: [] }
+    expect(validarReceta(soloMasa, catalogoCakecicle)).toBeNull()
+    expect(validarReceta({ ...soloMasa, preparaciones: [] }, catalogoCakecicle)).toContain('ingrediente')
+    expect(
+      validarReceta({ ...cakecicle, preparaciones: [{ preparacionId: 'otra', cantidadUsada: 75 }] }, catalogoCakecicle),
+    ).toContain('preparaciones')
+    expect(
+      validarReceta({ ...cakecicle, preparaciones: [{ preparacionId: 'masa', cantidadUsada: 0 }] }, catalogoCakecicle),
+    ).toContain('positiva')
+    expect(
+      validarReceta({
+        ...cakecicle,
+        preparaciones: [
+          { preparacionId: 'masa', cantidadUsada: 50 },
+          { preparacionId: 'masa', cantidadUsada: 25 },
+        ],
+      }, catalogoCakecicle),
+    ).toContain('una vez')
   })
 })

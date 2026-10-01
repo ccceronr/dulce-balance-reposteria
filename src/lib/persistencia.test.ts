@@ -87,6 +87,17 @@ describe('persistencia local', () => {
     expect(datos.configuracion.valorRedondeo).toBe(1_000)
   })
 
+  it('conserva los datos guardados antes de que existieran las preparaciones base', () => {
+    const almacenamiento = crearAlmacenamiento()
+    const { preparaciones: _omitidas, ...datosAntiguos } = crearDatosIniciales()
+    almacenamiento.setItem(CLAVE_DATOS, JSON.stringify({ version: 1, datos: datosAntiguos }))
+
+    const datos = cargarDatos(almacenamiento)
+
+    expect(datos.preparaciones).toEqual([])
+    expect(datos.configuracion).toEqual(crearDatosIniciales().configuracion)
+  })
+
   it('recupera datos iniciales si el JSON está dañado o tiene una versión inválida', () => {
     const almacenamiento = crearAlmacenamiento()
     almacenamiento.setItem(CLAVE_DATOS, '{"version":999,"inventario":[]}')

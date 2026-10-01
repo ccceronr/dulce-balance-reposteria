@@ -1,11 +1,18 @@
 import PrecioYSobres from './PrecioYSobres'
 import { FORMATO_COP, FORMATO_PORCENTAJE } from '../lib/formato'
-import type { ArticuloInventario, Configuracion, PresentacionVenta, Receta } from '../lib/modelos'
+import type {
+  ArticuloInventario,
+  Configuracion,
+  PreparacionBase,
+  PresentacionVenta,
+  Receta,
+} from '../lib/modelos'
 import { calcularResultadoPresentacion } from '../lib/presentaciones'
 
 interface DetalleCajaProps {
   caja: PresentacionVenta
   inventario: ArticuloInventario[]
+  preparaciones: PreparacionBase[]
   recetas: Receta[]
   configuracion: Configuracion
   onCambiarPrecio: (precioVentaReal: number | undefined) => void
@@ -16,13 +23,18 @@ interface DetalleCajaProps {
 function DetalleCaja({
   caja,
   inventario,
+  preparaciones,
   recetas,
   configuracion,
   onCambiarPrecio,
   onEditar,
   onVolver,
 }: DetalleCajaProps) {
-  const resultado = calcularResultadoPresentacion(caja, { inventario, recetas }, configuracion)
+  const resultado = calcularResultadoPresentacion(
+    caja,
+    { inventario, recetas, preparaciones },
+    configuracion,
+  )
   const unidades = caja.productos.reduce((total, producto) => total + producto.cantidad, 0)
 
   return (

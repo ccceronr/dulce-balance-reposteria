@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ArticuloInventario, PresentacionVenta, Receta } from './modelos'
+import type { ArticuloInventario, PreparacionBase, PresentacionVenta, Receta } from './modelos'
 import { articuloEstaEnUso, cambiaUnidadEnUso, validarArticulo } from './inventario'
 
 const mantequilla: ArticuloInventario = {
@@ -41,6 +41,7 @@ const datos = {
   inventario: [mantequilla, cinta],
   recetas: [receta],
   presentaciones: [presentacion],
+  preparaciones: [] as PreparacionBase[],
 }
 
 describe('articuloEstaEnUso', () => {
@@ -48,6 +49,18 @@ describe('articuloEstaEnUso', () => {
     expect(articuloEstaEnUso('mantequilla', datos)).toBe(true)
     expect(articuloEstaEnUso('cinta', datos)).toBe(true)
     expect(articuloEstaEnUso('azucar', datos)).toBe(false)
+  })
+
+  it('detecta insumos usados solo en una preparación base', () => {
+    const masa: PreparacionBase = {
+      id: 'masa',
+      nombre: 'Masa',
+      ingredientes: [{ insumoId: 'azucar', cantidadUsada: 100 }],
+      rendimientoTotal: 500,
+      unidad: 'g',
+    }
+
+    expect(articuloEstaEnUso('azucar', { ...datos, preparaciones: [masa] })).toBe(true)
   })
 })
 

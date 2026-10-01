@@ -8,10 +8,14 @@ import {
 import type {
   ArticuloInventario,
   Configuracion,
+  DatosAplicacion,
   DetalleSobreVenta,
   Receta,
   TipoInventario,
 } from './modelos'
+import { calcularCostoPreparacion } from './preparaciones'
+
+type Catalogo = Pick<DatosAplicacion, 'inventario' | 'preparaciones'>
 
 export type ResultadoReceta =
   | {
@@ -29,10 +33,7 @@ export type ResultadoReceta =
     }
   | { ok: false; error: string }
 
-export function validarReceta(
-  receta: Receta,
-  inventario: ArticuloInventario[],
-): string | null {
+export function validarReceta(receta: Receta, datos: Catalogo): string | null {
   if (!receta.nombre.trim()) {
     return 'El nombre de la receta es obligatorio.'
   }
@@ -46,20 +47,50 @@ export function validarReceta(
     return errorPrecio
   }
 
-  if (receta.ingredientes.length === 0) {
-    return 'Agrega al menos un ingrediente a la receta.'
+  const preparaciones = receta.preparaciones ?? []
+  if (receta.ingredientes.length === 0 && preparaciones.length === 0) {
+    return 'Agrega al menos un ingrediente o una preparación base a la receta.'
   }
 
   const errorIngredientes = validarLineas(
     receta.ingredientes,
-    inventario,
+    datos.inventario,
     'ingrediente',
   )
   if (errorIngredientes) {
     return errorIngredientes
   }
 
-  return validarLineas(receta.empaques, inventario, 'empaque')
+  const errorPreparaciones = validarLineasPreparacion(preparaciones, datos)
+  if (errorPreparaciones) {
+    return errorPreparaciones
+  }
+
+  return validarLineas(receta.empaques, datos.inventario, 'empaque')
+}
+
+function validarLineasPreparacion(
+  lineas: NonNullable<Receta['preparaciones']>,
+  datos: Catalogo,
+): string | null {
+  const ids = new Set<string>()
+
+  for (const linea of lineas) {
+    if (!datos.preparaciones.some((preparacion) => preparacion.id === linea.preparacionId)) {
+      return 'Selecciona preparaciones base válidas para la receta.'
+    }
+
+    if (!Number.isFinite(linea.cantidadUsada) || linea.cantidadUsada <= 0) {
+      return 'La cantidad de cada preparación base debe ser positiva.'
+    }
+
+    if (ids.has(linea.preparacionId)) {
+      return 'Cada preparación base solo puede agregarse una vez.'
+    }
+    ids.add(linea.preparacionId)
+  }
+
+  return null
 }
 
 function validarLineas(
@@ -95,7 +126,7 @@ function validarLineas(
 
 export function calcularResultadoReceta(
   receta: Receta,
-  inventario: ArticuloInventario[],
+  datos: Catalogo,
   configuracion: Configuracion,
 ): ResultadoReceta {
   const insumos: DatosInsumo[] = []
@@ -106,7 +137,7 @@ export function calcularResultadoReceta(
   ]
 
   for (const { linea, factor } of lineas) {
-    const articulo = inventario.find((item) => item.id === linea.insumoId)
+    const articulo = datos.inventario.find((item) => item.id === linea.insumoId)
     if (!articulo) {
       return {
         ok: false,
@@ -118,6 +149,29 @@ export function calcularResultadoReceta(
       precioCompra: articulo.precioCompra,
       cantidadTotalComprada: articulo.cantidadTotalComprada,
       cantidadUsada: linea.cantidadUsada * factor,
+    })
+  }
+
+  // Las preparaciones base son por tanda, como los ingredientes: su costo total se reparte
+  // entre lo que pesan o miden, y se cobra la parte usada.
+  for (const linea of receta.preparaciones ?? []) {
+    const preparacion = datos.preparaciones.find((item) => item.id === linea.preparacionId)
+    if (!preparacion) {
+      return {
+        ok: false,
+        error: 'Una de las preparaciones base de esta receta ya no existe. Edita la receta para reemplazarla.',
+      }
+    }
+
+    const costoPreparacion = calcularCostoPreparacion(preparacion, datos.inventario)
+    if (!costoPreparacion.ok) {
+      return costoPreparacion
+    }
+
+    insumos.push({
+      precioCompra: costoPreparacion.costoTotal,
+      cantidadTotalComprada: preparacion.rendimientoTotal,
+      cantidadUsada: linea.cantidadUsada,
     })
   }
 

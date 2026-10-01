@@ -6,6 +6,7 @@ import { FORMATO_PORCENTAJE } from '../lib/formato'
 import type {
   ArticuloInventario,
   Configuracion,
+  PreparacionBase,
   PresentacionVenta,
   Receta,
   TipoElaboracion,
@@ -29,6 +30,7 @@ interface FormularioCaja {
 
 interface CajasProps {
   inventario: ArticuloInventario[]
+  preparaciones: PreparacionBase[]
   recetas: Receta[]
   presentaciones: PresentacionVenta[]
   configuracion: Configuracion
@@ -52,6 +54,7 @@ function formularioVacio(): FormularioCaja {
 
 function Cajas({
   inventario,
+  preparaciones,
   recetas,
   presentaciones,
   configuracion,
@@ -255,6 +258,7 @@ function Cajas({
         configuracion={configuracion}
         inventario={inventario}
         key={cajaSeleccionada.id}
+        preparaciones={preparaciones}
         onCambiarPrecio={(precioVentaReal) => onGuardar({ ...cajaSeleccionada, precioVentaReal })}
         onEditar={() => editarCaja(cajaSeleccionada)}
         onVolver={() => setCajaDetalle(null)}

@@ -1,9 +1,11 @@
 import { useState, type FormEvent } from 'react'
 import DetalleReceta from './DetalleReceta'
 import IconoChocolates from './IconoChocolates'
+import PreparacionesBase from './PreparacionesBase'
 import type {
   ArticuloInventario,
   Configuracion,
+  PreparacionBase,
   PresentacionVenta,
   Receta,
   TipoElaboracion,
@@ -14,9 +16,12 @@ import { validarReceta } from '../lib/recetas'
 
 interface LineaFormulario {
   id: string
+  // Id de un ingrediente del inventario, o PREFIJO_PREPARACION + id de una preparación base.
   insumoId: string
   cantidadUsada: string
 }
+
+const PREFIJO_PREPARACION = 'prep:'
 
 interface FormularioReceta {
   nombre: string
@@ -28,11 +33,14 @@ interface FormularioReceta {
 
 interface RecetasProps {
   inventario: ArticuloInventario[]
+  preparaciones: PreparacionBase[]
   recetas: Receta[]
   presentaciones: PresentacionVenta[]
   configuracion: Configuracion
   onGuardar: (receta: Receta) => void
   onEliminar: (recetaId: string) => void
+  onGuardarPreparacion: (preparacion: PreparacionBase) => void
+  onEliminarPreparacion: (preparacionId: string) => void
   onIrAInventario: () => void
 }
 
@@ -60,11 +68,14 @@ function convertirLineas(lineas: Receta['ingredientes']): LineaFormulario[] {
 
 function Recetas({
   inventario,
+  preparaciones,
   recetas,
   presentaciones,
   configuracion,
   onGuardar,
   onEliminar,
+  onGuardarPreparacion,
+  onEliminarPreparacion,
   onIrAInventario,
 }: RecetasProps) {
   const [formulario, setFormulario] = useState<FormularioReceta>(formularioVacio)
@@ -96,7 +107,14 @@ function Recetas({
       nombre: receta.nombre,
       rendimiento: String(receta.rendimiento),
       tipoElaboracion: receta.tipoElaboracion,
-      ingredientes: convertirLineas(receta.ingredientes),
+      ingredientes: [
+        ...convertirLineas(receta.ingredientes),
+        ...(receta.preparaciones ?? []).map((linea) => ({
+          id: crypto.randomUUID(),
+          insumoId: PREFIJO_PREPARACION + linea.preparacionId,
+          cantidadUsada: String(linea.cantidadUsada),
+        })),
+      ],
       empaques: convertirLineas(receta.empaques),
     })
     setRecetaEditando(receta.id)
@@ -144,10 +162,18 @@ function Recetas({
       tipoElaboracion: formulario.tipoElaboracion,
       // Conserva el precio real guardado desde la pantalla de detalle.
       precioVentaReal: recetas.find((existente) => existente.id === recetaEditando)?.precioVentaReal,
-      ingredientes: formulario.ingredientes.map((linea) => ({
-        insumoId: linea.insumoId,
-        cantidadUsada: Number(linea.cantidadUsada),
-      })),
+      ingredientes: formulario.ingredientes
+        .filter((linea) => !linea.insumoId.startsWith(PREFIJO_PREPARACION))
+        .map((linea) => ({
+          insumoId: linea.insumoId,
+          cantidadUsada: Number(linea.cantidadUsada),
+        })),
+      preparaciones: formulario.ingredientes
+        .filter((linea) => linea.insumoId.startsWith(PREFIJO_PREPARACION))
+        .map((linea) => ({
+          preparacionId: linea.insumoId.slice(PREFIJO_PREPARACION.length),
+          cantidadUsada: Number(linea.cantidadUsada),
+        })),
       empaques: formulario.empaques.map((linea) => ({
         insumoId: linea.insumoId,
         cantidadUsada: Number(linea.cantidadUsada),
@@ -164,7 +190,7 @@ function Recetas({
       return
     }
 
-    const errorValidacion = validarReceta(receta, inventario)
+    const errorValidacion = validarReceta(receta, { inventario, preparaciones })
     if (errorValidacion) {
       setError(errorValidacion)
       return
@@ -205,14 +231,19 @@ function Recetas({
     const esIngrediente = tipo === 'ingredientes'
     const lineas = formulario[tipo]
     const opciones = esIngrediente ? ingredientesDisponibles : empaquesDisponibles
+    // En los ingredientes también se pueden elegir las preparaciones base.
+    const totalOpciones = opciones.length + (esIngrediente ? preparaciones.length : 0)
     const seleccionados = lineas.map((linea) => linea.insumoId).filter(Boolean)
 
     return (
       <div className="recipe-lines">
         {lineas.map((linea, indice) => {
           const articuloSeleccionado = opciones.find((articulo) => articulo.id === linea.insumoId)
+          const preparacionSeleccionada = preparaciones.find(
+            (preparacion) => PREFIJO_PREPARACION + preparacion.id === linea.insumoId,
+          )
           const unidad = esIngrediente
-            ? ETIQUETA_UNIDAD[articuloSeleccionado?.unidad ?? 'g']
+            ? ETIQUETA_UNIDAD[preparacionSeleccionada?.unidad ?? articuloSeleccionado?.unidad ?? 'g']
             : ETIQUETA_UNIDAD.unidad
 
           return (
@@ -227,15 +258,45 @@ function Recetas({
                   value={linea.insumoId}
                 >
                   <option value="">Seleccionar {esIngrediente ? 'ingrediente' : 'empaque'}</option>
-                  {opciones.map((articulo) => (
-                    <option
-                      disabled={seleccionados.includes(articulo.id) && articulo.id !== linea.insumoId}
-                      key={articulo.id}
-                      value={articulo.id}
-                    >
-                      {articulo.nombre}
-                    </option>
-                  ))}
+                  {esIngrediente && preparaciones.length > 0 ? (
+                    <>
+                      <optgroup label="Ingredientes comprados">
+                        {opciones.map((articulo) => (
+                          <option
+                            disabled={seleccionados.includes(articulo.id) && articulo.id !== linea.insumoId}
+                            key={articulo.id}
+                            value={articulo.id}
+                          >
+                            {articulo.nombre}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Preparaciones base">
+                        {preparaciones.map((preparacion) => {
+                          const valor = PREFIJO_PREPARACION + preparacion.id
+                          return (
+                            <option
+                              disabled={seleccionados.includes(valor) && valor !== linea.insumoId}
+                              key={preparacion.id}
+                              value={valor}
+                            >
+                              {preparacion.nombre}
+                            </option>
+                          )
+                        })}
+                      </optgroup>
+                    </>
+                  ) : (
+                    opciones.map((articulo) => (
+                      <option
+                        disabled={seleccionados.includes(articulo.id) && articulo.id !== linea.insumoId}
+                        key={articulo.id}
+                        value={articulo.id}
+                      >
+                        {articulo.nombre}
+                      </option>
+                    ))
+                  )}
                 </select>
               </label>
               <label className="field recipe-line-quantity">
@@ -253,7 +314,7 @@ function Recetas({
                   />
                   <span>{unidad}</span>
                 </div>
-                {esIngrediente && articuloSeleccionado && (
+                {esIngrediente && (articuloSeleccionado || preparacionSeleccionada) && (
                   <small className="field-hint">Por tanda</small>
                 )}
                 {!esIngrediente && articuloSeleccionado && (
@@ -273,7 +334,7 @@ function Recetas({
         })}
         <button
           className="add-line"
-          disabled={opciones.length <= seleccionados.length}
+          disabled={totalOpciones <= seleccionados.length}
           onClick={() => agregarLinea(tipo)}
           type="button"
         >
@@ -290,6 +351,7 @@ function Recetas({
         configuracion={configuracion}
         inventario={inventario}
         key={recetaSeleccionada.id}
+        preparaciones={preparaciones}
         onCambiarPrecio={(precioVentaReal) => onGuardar({ ...recetaSeleccionada, precioVentaReal })}
         onEditar={() => editarReceta(recetaSeleccionada)}
         onVolver={() => setRecetaDetalle(null)}
@@ -439,10 +501,15 @@ function Recetas({
                 <span aria-hidden="true" className="recipe-mark">R</span>
                 <span>
                   <span className="recipe-row-title">{receta.nombre}</span>
-                  <span className="recipe-row-meta">{receta.ingredientes.length} ingredientes · {receta.empaques.length} empaques individuales</span>
+                  <span className="recipe-row-meta">
+                    {receta.ingredientes.length + (receta.preparaciones?.length ?? 0)} ingredientes ·{' '}
+                    {receta.empaques.length} empaques individuales
+                  </span>
                 </span>
               </button>
-              <span className="recipe-row-yield">{receta.rendimiento} unidades</span>
+              <span className="recipe-row-yield">
+                {receta.rendimiento} {receta.rendimiento === 1 ? 'unidad' : 'unidades'}
+              </span>
               <span className={`recipe-type ${receta.tipoElaboracion}`}>
                 {receta.tipoElaboracion === 'rapida' ? 'Rápida' : 'Elaborada'} ·{' '}
                 {FORMATO_PORCENTAJE.format(obtenerPorcentajeManoObra(receta.tipoElaboracion, configuracion))}
@@ -472,6 +539,15 @@ function Recetas({
           )}
         </div>
       )}
+
+      <PreparacionesBase
+        inventario={inventario}
+        onEliminar={onEliminarPreparacion}
+        onGuardar={onGuardarPreparacion}
+        onIrAInventario={onIrAInventario}
+        preparaciones={preparaciones}
+        recetas={recetas}
+      />
     </section>
   )
 }

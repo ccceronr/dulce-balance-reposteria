@@ -1,11 +1,12 @@
 import PrecioYSobres from './PrecioYSobres'
 import { FORMATO_COP, FORMATO_PORCENTAJE } from '../lib/formato'
-import type { ArticuloInventario, Configuracion, Receta } from '../lib/modelos'
+import type { ArticuloInventario, Configuracion, PreparacionBase, Receta } from '../lib/modelos'
 import { calcularResultadoReceta } from '../lib/recetas'
 
 interface DetalleRecetaProps {
   receta: Receta
   inventario: ArticuloInventario[]
+  preparaciones: PreparacionBase[]
   configuracion: Configuracion
   onCambiarPrecio: (precioVentaReal: number | undefined) => void
   onEditar: () => void
@@ -15,12 +16,13 @@ interface DetalleRecetaProps {
 function DetalleReceta({
   receta,
   inventario,
+  preparaciones,
   configuracion,
   onCambiarPrecio,
   onEditar,
   onVolver,
 }: DetalleRecetaProps) {
-  const resultado = calcularResultadoReceta(receta, inventario, configuracion)
+  const resultado = calcularResultadoReceta(receta, { inventario, preparaciones }, configuracion)
 
   return (
     <section aria-labelledby="detail-title" className="recipe-detail">
@@ -32,7 +34,7 @@ function DetalleReceta({
           <p className="eyebrow"><span /> Costos y bolsillos</p>
           <h1 id="detail-title">{receta.nombre}</h1>
           <p className="page-description">
-            {receta.rendimiento} unidades por tanda ·{' '}
+            {receta.rendimiento} {receta.rendimiento === 1 ? 'unidad' : 'unidades'} por tanda ·{' '}
             {receta.tipoElaboracion === 'rapida' ? 'Elaboración rápida' : 'Elaboración elaborada'}
           </p>
         </div>

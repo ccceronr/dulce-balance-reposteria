@@ -11,7 +11,10 @@ import type {
 import { calcularResultadoPresentacion } from './presentaciones'
 import { calcularResultadoReceta } from './recetas'
 
-type DatosCatalogo = Pick<DatosAplicacion, 'inventario' | 'recetas' | 'presentaciones'>
+type DatosCatalogo = Pick<
+  DatosAplicacion,
+  'inventario' | 'recetas' | 'presentaciones' | 'preparaciones'
+>
 
 export interface DatosNuevaVenta {
   tipo: TipoVenta
@@ -48,7 +51,7 @@ function obtenerCostoVigente(
       return { ok: false, error: 'Selecciona un producto válido.' }
     }
 
-    const resultado = calcularResultadoReceta(receta, datos.inventario, configuracion)
+    const resultado = calcularResultadoReceta(receta, datos, configuracion)
     return resultado.ok
       ? {
           ok: true,

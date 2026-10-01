@@ -96,7 +96,7 @@ function validarLineas(
 
 export function calcularResultadoPresentacion(
   presentacion: PresentacionVenta,
-  datos: Pick<DatosAplicacion, 'inventario' | 'recetas'>,
+  datos: Pick<DatosAplicacion, 'inventario' | 'recetas' | 'preparaciones'>,
   configuracion: Configuracion,
 ): ResultadoPresentacion {
   let costoProductos = 0
@@ -110,7 +110,7 @@ export function calcularResultadoPresentacion(
       }
     }
 
-    const resultadoReceta = calcularResultadoReceta(receta, datos.inventario, configuracion)
+    const resultadoReceta = calcularResultadoReceta(receta, datos, configuracion)
     if (!resultadoReceta.ok) {
       return { ok: false, error: `“${receta.nombre}”: ${resultadoReceta.error}` }
     }

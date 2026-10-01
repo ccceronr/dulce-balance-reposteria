@@ -16,10 +16,30 @@ export interface IngredienteReceta {
   cantidadUsada: number
 }
 
+// Cantidad de una preparación base usada en una receta, en la unidad de la preparación.
+export interface LineaPreparacion {
+  preparacionId: string
+  cantidadUsada: number
+}
+
+export type UnidadPreparacion = 'g' | 'ml'
+
+// Algo que se prepara para usar dentro de varios productos (p. ej., masa de pastel).
+export interface PreparacionBase {
+  id: string
+  nombre: string
+  ingredientes: IngredienteReceta[]
+  // Cuánto pesa o mide lo que sale de la preparación.
+  rendimientoTotal: number
+  unidad: UnidadPreparacion
+}
+
 export interface Receta {
   id: string
   nombre: string
   ingredientes: IngredienteReceta[]
+  // Opcional: las recetas guardadas antes de existir las preparaciones no lo tienen.
+  preparaciones?: LineaPreparacion[]
   empaques: IngredienteReceta[]
   rendimiento: number
   tipoElaboracion: TipoElaboracion
@@ -85,6 +105,7 @@ export interface VentaHistorial {
 
 export interface DatosAplicacion {
   inventario: ArticuloInventario[]
+  preparaciones: PreparacionBase[]
   recetas: Receta[]
   presentaciones: PresentacionVenta[]
   configuracion: Configuracion

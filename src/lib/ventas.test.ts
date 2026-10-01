@@ -55,7 +55,7 @@ const caja: PresentacionVenta = {
   tipoElaboracion: 'elaborada',
 }
 
-const datos = { inventario, recetas: [brownie], presentaciones: [caja] }
+const datos = { inventario, recetas: [brownie], presentaciones: [caja], preparaciones: [] }
 
 const ventaBrownies: DatosNuevaVenta = {
   tipo: 'producto',

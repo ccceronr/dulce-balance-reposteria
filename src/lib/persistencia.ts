@@ -21,6 +21,7 @@ export type ResultadoRespaldo =
 export function crearDatosIniciales(): DatosAplicacion {
   return {
     inventario: [],
+    preparaciones: [],
     recetas: [],
     presentaciones: [],
     configuracion: { ...CONFIGURACION_PREDETERMINADA },
@@ -42,6 +43,8 @@ function esDatosAplicacion(valor: unknown): valor is DatosAplicacion {
     Array.isArray(valor.recetas) &&
     Array.isArray(valor.presentaciones) &&
     Array.isArray(valor.historialVentas) &&
+    // Las preparaciones llegaron después: los datos antiguos pueden no tenerlas.
+    (valor.preparaciones === undefined || Array.isArray(valor.preparaciones)) &&
     typeof valor.configuracion.porcentajeIndirectos === 'number' &&
     typeof valor.configuracion.multiplicadorEstandar === 'number' &&
     typeof valor.configuracion.multiplicadorPremium === 'number' &&
@@ -54,6 +57,7 @@ function esDatosAplicacion(valor: unknown): valor is DatosAplicacion {
 function completarDatos(datos: DatosAplicacion): DatosAplicacion {
   return {
     ...datos,
+    preparaciones: datos.preparaciones ?? [],
     configuracion: { ...CONFIGURACION_PREDETERMINADA, ...datos.configuracion },
   }
 }

@@ -1,6 +1,6 @@
 import type { ArticuloInventario, DatosAplicacion } from './modelos'
 
-type DatosUso = Pick<DatosAplicacion, 'recetas' | 'presentaciones'>
+type DatosUso = Pick<DatosAplicacion, 'recetas' | 'presentaciones' | 'preparaciones'>
 
 export function articuloEstaEnUso(articuloId: string, datos: DatosUso): boolean {
   const usadoEnReceta = datos.recetas.some((receta) =>
@@ -11,8 +11,11 @@ export function articuloEstaEnUso(articuloId: string, datos: DatosUso): boolean 
   const usadoEnPresentacion = datos.presentaciones.some((presentacion) =>
     presentacion.empaques.some((empaque) => empaque.insumoId === articuloId),
   )
+  const usadoEnPreparacion = datos.preparaciones.some((preparacion) =>
+    preparacion.ingredientes.some((linea) => linea.insumoId === articuloId),
+  )
 
-  return usadoEnReceta || usadoEnPresentacion
+  return usadoEnReceta || usadoEnPresentacion || usadoEnPreparacion
 }
 
 export function validarArticulo(
@@ -45,7 +48,7 @@ export function validarArticulo(
     articuloActual.tipo !== articulo.tipo &&
     articuloEstaEnUso(articulo.id, datos)
   ) {
-    return 'No puedes cambiar el tipo de un ingrediente o empaque asociado a una receta o caja.'
+    return 'No puedes cambiar el tipo de un ingrediente o empaque asociado a una receta, preparación o caja.'
   }
 
   return null

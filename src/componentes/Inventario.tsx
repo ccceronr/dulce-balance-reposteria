@@ -4,6 +4,7 @@ import { ETIQUETA_UNIDAD, FORMATO_CANTIDAD, FORMATO_COP } from '../lib/formato'
 import { articuloEstaEnUso, cambiaUnidadEnUso, validarArticulo } from '../lib/inventario'
 import type {
   ArticuloInventario,
+  PreparacionBase,
   PresentacionVenta,
   Receta,
   TipoInventario,
@@ -22,6 +23,7 @@ interface FormularioInventario {
 
 interface InventarioProps {
   inventario: ArticuloInventario[]
+  preparaciones: PreparacionBase[]
   recetas: Receta[]
   presentaciones: PresentacionVenta[]
   estadoGuardado: string
@@ -41,6 +43,7 @@ const UNIDADES_INGREDIENTE: UnidadInventario[] = ['g', 'ml', 'unidad']
 
 function Inventario({
   inventario,
+  preparaciones,
   recetas,
   presentaciones,
   estadoGuardado,
@@ -56,7 +59,7 @@ function Inventario({
   const [aviso, setAviso] = useState('')
 
   function estaEnUso(articuloId: string): boolean {
-    return articuloEstaEnUso(articuloId, { recetas, presentaciones })
+    return articuloEstaEnUso(articuloId, { recetas, presentaciones, preparaciones })
   }
 
   const articulosFiltrados = inventario.filter((articulo) => {
@@ -117,7 +120,7 @@ function Inventario({
       unidad: formulario.tipo === 'ingrediente' ? formulario.unidad : 'unidad',
     }
 
-    const datos = { inventario, recetas, presentaciones }
+    const datos = { inventario, recetas, presentaciones, preparaciones }
     const errorValidacion = validarArticulo(articulo, datos)
     if (errorValidacion) {
       setError(errorValidacion)
@@ -136,7 +139,7 @@ function Inventario({
   function eliminarArticulo(articulo: ArticuloInventario) {
     setAviso('')
     if (estaEnUso(articulo.id)) {
-      setError(`No puedes eliminar “${articulo.nombre}” porque está asociado a una receta o caja.`)
+      setError(`No puedes eliminar “${articulo.nombre}” porque está asociado a una receta, preparación o caja.`)
       return
     }
 

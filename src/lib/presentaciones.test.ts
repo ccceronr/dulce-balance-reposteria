@@ -80,7 +80,7 @@ const caja: PresentacionVenta = {
   tipoElaboracion: 'elaborada',
 }
 
-const datos = { inventario, recetas, presentaciones: [caja] }
+const datos = { inventario, recetas, presentaciones: [caja], preparaciones: [] }
 
 function calcular(presentacion: PresentacionVenta, datosActuales = datos) {
   const resultado = calcularResultadoPresentacion(

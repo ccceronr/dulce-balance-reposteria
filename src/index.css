@@ -837,6 +837,33 @@ select:focus-visible {
   white-space: nowrap;
 }
 
+/* Preparaciones base (debajo de los productos en Recetas) */
+.preparations-section {
+  margin-top: 3rem;
+  border-top: 1px solid var(--color-linea);
+  padding-top: 2.2rem;
+}
+
+.preparations-section .page-heading h2 {
+  margin: 0;
+  color: var(--color-texto);
+  font-family: var(--fuente-editorial);
+  font-size: clamp(1.9rem, 4.5vw, 2.6rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.preparations-empty {
+  margin: 0;
+  color: var(--color-texto-secundario);
+  font-size: 0.83rem;
+}
+
+.preparation-cost-error {
+  color: var(--color-peligro);
+  font-size: 0.7rem;
+}
+
 .recipe-empty-state {
   min-height: 280px;
 }
