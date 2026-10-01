@@ -17,6 +17,7 @@ Los datos se guardan solo en el dispositivo. Para pasarlos a otro teléfono o pr
 
 - **Inventario**: ingredientes (en g, ml o unidades) y empaques (por unidad), con su precio de compra y la cantidad comprada.
 - **Recetas**: ingredientes por tanda, empaques individuales por unidad, rendimiento y tipo de elaboración (rápida o elaborada). Se pueden duplicar.
+- **Preparaciones base**: masas, rellenos o cremas (por ejemplo, la masa de pastel con leche condensada) que se registran una vez, con lo que pesan al terminar, y se usan por gramos dentro de varios productos. Si cambia la preparación, se actualizan todos los productos que la usan.
 - **Costos y precios**: costo de la tanda y por unidad, con costos indirectos; precios sugeridos Estándar y Premium con redondeo configurable, y un precio real editable.
 - **Tres bolsillos**: reposición de insumos, sueldo de mano de obra y ganancia limpia, más el dinero libre. Alertas si se vende a pérdida o si no alcanza para el sueldo.
 - **Cajas mixtas**: combinan productos y empaques exteriores, con su propio tipo de elaboración, precios y bolsillos.
@@ -82,4 +83,4 @@ Vite, React, TypeScript, Tailwind CSS, Vitest, vite-plugin-pwa (service worker y
 
 ## Estado
 
-Fases completadas: estructura base, cálculos, persistencia, inventario, recetas, resultados y bolsillos, cajas mixtas, historial de ventas, configuración y respaldo, PWA instalable sin conexión, despliegue en Vercel y modo claro y oscuro.
+Fases completadas: estructura base, cálculos, persistencia, inventario, recetas, resultados y bolsillos, cajas mixtas, historial de ventas, configuración y respaldo, PWA instalable sin conexión, despliegue en Vercel, modo claro y oscuro, y preparaciones base.
